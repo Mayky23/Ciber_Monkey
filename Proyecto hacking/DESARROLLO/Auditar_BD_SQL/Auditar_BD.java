@@ -1,7 +1,9 @@
 package Auditar_BD_SQL;
+//javac -cp .;lib/mysql-connector-java-5.1.15.jar Auditar_BD.java
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -70,18 +72,20 @@ public class Auditar_BD {
         System.out.print("Ingrese la contraseña para verificar inyección de SQL: ");
         String password = scanner.nextLine();
 
-        String sqlQuery = "SELECT * FROM users WHERE username = '" + username + "' AND password = '" + password + "'";
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(sqlQuery);
+        String sqlQuery = "SELECT * FROM users WHERE username = ? AND password = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sqlQuery)) {
+            statement.setString(1, username);
+            statement.setString(2, password);
+            ResultSet resultSet = statement.executeQuery();
 
-        System.out.println("\nResultados de consulta para verificar inyección de SQL:");
-        if (resultSet.next()) {
-            System.out.println("Se encontraron resultados. Vulnerabilidad de inyección de SQL detectada.");
-        } else {
-            System.out.println("No se encontraron resultados. No se detectaron vulnerabilidades de inyección de SQL.");
+            System.out.println("\nResultados de consulta para verificar inyección de SQL:");
+            if (resultSet.next()) {
+                System.out.println("Se encontraron resultados. Vulnerabilidad de inyección de SQL detectada.");
+            } else {
+                System.out.println("No se encontraron resultados. No se detectaron vulnerabilidades de inyección de SQL.");
+            }
+            resultSet.close();
         }
-        resultSet.close();
-        statement.close();
     }
 
     private static void findInsecureData(Connection connection) throws SQLException {
@@ -101,18 +105,19 @@ public class Auditar_BD {
             String columnName = resultSet.getString("COLUMN_NAME");
             String dataType = resultSet.getString("DATA_TYPE");
 
-            String sqlQuery = "SELECT * FROM " + tableName + " WHERE " + columnName + " LIKE '%" + sensitiveDataPattern + "%'";
-            Statement dataStatement = connection.createStatement();
-            ResultSet dataResultSet = dataStatement.executeQuery(sqlQuery);
+            String sqlQuery = "SELECT * FROM " + tableName + " WHERE " + columnName + " LIKE ?";
+            try (PreparedStatement dataStatement = connection.prepareStatement(sqlQuery)) {
+                dataStatement.setString(1, "%" + sensitiveDataPattern + "%");
+                ResultSet dataResultSet = dataStatement.executeQuery();
 
-            while (dataResultSet.next()) {
-                String columnValue = dataResultSet.getString(columnName);
-                TableColumn insecureColumn = new TableColumn(tableName, columnName, dataType, columnValue);
-                insecureColumns.add(insecureColumn);
+                while (dataResultSet.next()) {
+                    String columnValue = dataResultSet.getString(columnName);
+                    TableColumn insecureColumn = new TableColumn(tableName, columnName, dataType, columnValue);
+                    insecureColumns.add(insecureColumn);
+                }
+
+                dataResultSet.close();
             }
-
-            dataResultSet.close();
-            dataStatement.close();
         }
 
         if (insecureColumns.isEmpty()) {
