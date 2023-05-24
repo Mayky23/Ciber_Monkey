@@ -1,6 +1,6 @@
 package CIDR_Calculadora;
 
-import java.net.InetAddress;
+import java.net.InetAddress; //realizar operaciones relacionadas con direcciones IP y nombres de host. 
 import java.util.Scanner;
 
 public class Calculadora_CIDR {

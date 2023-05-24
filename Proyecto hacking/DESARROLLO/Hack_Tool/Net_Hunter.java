@@ -133,6 +133,8 @@ public class Net_Hunter {
                 case 15:
                     System.out.println("SALIENDO DEL PROGRAMA...");
                     System.out.println("----------------------------------");
+                    System.out.println("|          By: MARH              |");
+                    System.out.println("----------------------------------");
                     break;
                 default:
                     System.out.println("OPCIÓN INVÁLIDA, INTÉNTALO DE NUEVO");
