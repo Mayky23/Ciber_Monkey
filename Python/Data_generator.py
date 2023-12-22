@@ -7,12 +7,25 @@ ALPHABET = [
 
 FIRST_NAMES = [
     "Juan", "María", "José", "Laura", "Carlos", "Sofía", "Luis", "Ana", "Pedro", "Marta",
-    "Alejandro", "Isabella", "Diego", "Valentina", "Gabriel"
+    "Alejandro", "Isabella", "Diego", "Valentina", "Gabriel",
+    "Fernando", "Adriana", "Miguel", "Elena", "Ricardo", "Beatriz", "Javier", "Claudia", "Raúl",
+    "Natalia", "Roberto", "Monica", "Daniel", "Carolina", "Hugo", "Victoria", "Fabiola", "Eduardo",
+    "Carmen", "Ángel", "Renata", "Pablo", "Lucía", "Raul", "Olivia", "Andrés", "Silvia", "Francisco"
 ]
 
 LAST_NAMES = [
     "Gómez", "Rodríguez", "Fernández", "López", "Pérez", "González", "Martínez", "Sánchez", "Romero", "Torres",
-    "Ortega", "Hernández", "Silva", "Ramírez", "Chavez"
+    "Ortega", "Hernández", "Silva", "Ramírez", "Chavez", "Luna", "Mendoza", "Guerrero", "Cruz", "Vargas", 
+    "Cabrera", "Cortez", "Román", "Castañeda", "Zapata", "Aguirre", "Moreno", "Delgado", "Ramos", "Orozco", 
+    "Soto", "Molina", "Cisneros", "Fuentes", "Vega", "Giménez", "Rosales", "Flores", "Valdez", "Acosta", "Herrera", "Núñez", 
+    "Carrillo", "Lara", "Escobar"
+]
+
+BANKS = [
+    "Banco Santander", "BBVA", "CaixaBank", "Bankia", "Banco Sabadell",
+    "Banco Popular", "ING Direct", "Bankinter", "Caja Rural",
+    "Kutxabank", "Abanca", "Unicaja Banco", "Ibercaja", "Deutsche Bank",
+    "Société Générale", "Barclays", "HSBC", "BNP Paribas", "Citibank"
 ]
 
 EMAIL_DOMAINS = [
@@ -20,17 +33,12 @@ EMAIL_DOMAINS = [
     "icloud.com", "mail.com", "live.com", "protonmail.com", "example.com"
 ]
 
-BANKS = [
-    "Banco A", "Banco B", "Banco C", "Banco D", "Banco E",
-    "Banco F", "Banco G", "Banco H", "Banco I", "Banco J"
-]
-
 
 def data_generator_main():
     while True:
-        response = input("¿Cuántas personas deseas generar? (Escribe 'salir' para terminar)\n")
+        response = input("¿Cuántas personas deseas generar? (Escribe 'n' para terminar)\n")
 
-        if response.lower() == "salir":
+        if response.lower() == "n":
             break
 
         try:
@@ -39,16 +47,22 @@ def data_generator_main():
             for i in range(num_people):
                 print(f"Datos de la persona #{i + 1}")
                 print("-----------------------------------------------------")
-                print("DNI:", generate_dni())
-                print("Nombre:", generate_name())
-                print("Email:", generate_email())
-                print("Cuenta bancaria:", generate_bank_account())
-                print("Fecha de nacimiento:", generate_date_of_birth())
-                print("Contraseña:", generate_password())
+                dni = generate_dni()
+                name, email = generate_name_and_email()
+                bank_account = generate_bank_account()
+                date_of_birth = generate_date_of_birth()
+                password = generate_password()
+                
+                print("DNI:", dni)
+                print("Nombre:", name)
+                print("Email:", email)
+                print("Cuenta bancaria:", bank_account)
+                print("Fecha de nacimiento:", date_of_birth)
+                print("Contraseña:", password)
                 print("-----------------------------------------------------")
 
         except ValueError:
-            print("Error: Ingresa un número válido o escribe 'salir' para terminar.")
+            print("Error: Ingresa un número válido o escribe 'n' para terminar.")
 
 
 def generate_dni():
@@ -56,19 +70,17 @@ def generate_dni():
     return f"{dni}{random.choice(ALPHABET)}"
 
 
-def generate_name():
+def generate_name_and_email():
     first_name = random.choice(FIRST_NAMES)
     last_name = random.choice(LAST_NAMES)
-    return f"{first_name} {last_name}"
-
-
-def generate_email():
-    first_name = random.choice(FIRST_NAMES).lower()
-    last_name = random.choice(LAST_NAMES).lower()
     domain = random.choice(EMAIL_DOMAINS)
-    variation = random.choice([".", "_", ""])
-    email = f"{first_name}{variation}{last_name}@{domain}"
-    return email
+
+    full_name = f"{first_name} {last_name}"
+    
+    # Email generation using the first letter of the first name and full last name
+    email = f"{first_name.lower()[0]}{last_name.lower()}@{domain}"
+
+    return full_name, email
 
 
 def generate_bank_account():

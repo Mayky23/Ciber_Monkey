@@ -5,15 +5,16 @@ CARACTERES_MAYUSCULAS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 NUMEROS = "0123456789"
 CARACTERES_ESPECIALES = "!@#$%^&*()_+-=[]{}|;':\"<>,.?/~`"
 
-def generar_contrasena(longitud, incluir_minusculas, incluir_mayusculas, incluir_numeros, incluir_especiales):
+def generar_contrasena(longitud, opciones):
     caracteres_usados = ""
-    if incluir_minusculas:
+
+    if "min" in opciones:
         caracteres_usados += CARACTERES_MINUSCULAS
-    if incluir_mayusculas:
+    if "may" in opciones:
         caracteres_usados += CARACTERES_MAYUSCULAS
-    if incluir_numeros:
+    if "num" in opciones:
         caracteres_usados += NUMEROS
-    if incluir_especiales:
+    if "esp" in opciones:
         caracteres_usados += CARACTERES_ESPECIALES
 
     contrasena = ''.join(secrets.choice(caracteres_usados) for _ in range(longitud))
@@ -25,12 +26,9 @@ def password_generator_main():
 
         if opcion.lower() == "s":
             longitud = int(input("Ingrese la longitud de la contraseña: "))
-            incluir_minusculas = input("Incluir caracteres en minúsculas? (s/n): ").lower() == "s"
-            incluir_mayusculas = input("Incluir caracteres en mayúsculas? (s/n): ").lower() == "s"
-            incluir_numeros = input("Incluir números? (s/n): ").lower() == "s"
-            incluir_especiales = input("Incluir caracteres especiales? (s/n): ").lower() == "s"
-
-            contrasena = generar_contrasena(longitud, incluir_minusculas, incluir_mayusculas, incluir_numeros, incluir_especiales)
+            opciones = input("Ingrese las opciones (min/may/num/esp): ").lower().split('/')
+            
+            contrasena = generar_contrasena(longitud, opciones)
 
             print("-------------------------------------------------------------------")
             print(f"La contraseña generada es: {contrasena}")
