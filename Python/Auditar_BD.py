@@ -9,7 +9,7 @@ class TableColumn:
         self.data_type = data_type
         self.column_value = column_value
 
-def main():
+def mysql_audit_main():
     try:
         # Pedimos datos relevantes para la conexión con la BD
         database_url = input("Ingrese la ruta de la conexión de la base de datos: ")
@@ -232,4 +232,4 @@ def check_plain_text_passwords(connection):
         print(f"Error al verificar contraseñas almacenadas en texto plano: {e}")
 
 if __name__ == "__main__":
-    main()
+    mysql_audit_main()

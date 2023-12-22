@@ -36,5 +36,5 @@ def escucha_puertos():
     except (socket.error, ValueError, subprocess.CalledProcessError) as e:
         print(f"Ocurrió un error: {e}")
 
-if __name__ == "__main__":
+def escucha_puertos_main():
     escucha_puertos()

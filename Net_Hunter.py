@@ -1,22 +1,22 @@
 import os
-from Cal_CIDR import main as Calculadora_CIDR_main
-from Wifi_Scanner import main as Wifi_Scanner_main
-from Dev_IP_act import main as Descubrir_Host_main
-from Port_scanner import main as PORTS_Scanner_main
-from Escucha_ports import main as Escucha_puertos_main
-from DDos_atack import main as DDos_Atack_main
-from Pswd_generator import main as PasswordGenerator_main
-from Contrasena_Cracking import Pswd_Cracking, wordlist
-from Encriptar_Desencriptar import main as Encriptador_main
-from Data_generator import main as Data_Generator_main
-from SQL_injection import main as SQL_Injection_main
-from Auditar_BD import main as Auditar_BD_main
+from Python.Cal_CIDR import calculate_cidr
+from Python.Wifi_Scanner import wifi_scanner_main
+from Python.Dev_IP_act import host_discovery_main
+from Python.Port_scanner import main as PORTS_Scanner_main
+from Python.Escucha_ports import escucha_puertos_main
+from Python.DDos_atack import ddos_attack_main
+from Python.Pswd_generator import password_generator_main
+from Python.Contrasena_Craking.Pswd_Craking import main as Contrasena_Cracking_main
+from Python.Encriptar_Desencriptar import encriptar_desencriptar_main
+from Python.Data_generator import data_generator_main
+from Python.SQL_injection import sql_injection_main
+from Python.Auditar_BD import mysql_audit_main
 
 
 def main():
     option = 0
 
-    while option != 15:
+    while option != 99:
         clear_screen()
 
         print(" /$$   /$$             /$$           /$$   /$$                       /$$                            ")
@@ -43,7 +43,8 @@ def main():
         print("| 11. GENERAR DATOS              |")
         print("| 13. INYECCIÓN SQL              |")
         print("| 14. AUDITAR BD SQL             |")
-        print("| 15. SALIR DEL PROGRAMA         |")
+        print("|--------------------------------|")
+        print("| 99. SALIR DEL PROGRAMA         |")
         print("==================================")
         print("\nSELECCIONA UNA OPCIÓN: ")
 
@@ -62,19 +63,19 @@ def clear_screen():
 
 def switch_options(option):
     options_dict = {
-        1: Calculadora_CIDR_main,
-        2: Wifi_Scanner_main,
-        3: Descubrir_Host_main,
+        1: calculate_cidr,
+        2: wifi_scanner_main, 
+        3: host_discovery_main,
         4: PORTS_Scanner_main,
-        5: Escucha_puertos_main,
-        6: DDos_Atack_main,
-        7: PasswordGenerator_main,
-        8: lambda: Pswd_Cracking(wordlist),
-        9: Encriptador_main,
-        11: Data_Generator_main,
-        13: SQL_Injection_main,
-        14: Auditar_BD_main,
-        15: lambda: print("SALIENDO DEL PROGRAMA...\n----------------------------------\n|          By: MARH              |\n----------------------------------")
+        5: escucha_puertos_main,
+        6: ddos_attack_main, 
+        7: password_generator_main,
+        8: Contrasena_Cracking_main,
+        9: encriptar_desencriptar_main,
+        11: data_generator_main,
+        13: sql_injection_main,
+        # 14: mysql_audit_main,
+        99: lambda: print("SALIENDO DEL PROGRAMA...\n----------------------------------\n|          By: MARH              |\n----------------------------------")
     }
 
     try:
@@ -83,7 +84,7 @@ def switch_options(option):
         func()
         print("----------------------------------")
 
-        if option != 15:
+        if option != 99:
             input("PRESIONA ENTER PARA CONTINUAR")
     except Exception as e:
         print(f"Se produjo un error: {e}")

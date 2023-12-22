@@ -26,7 +26,7 @@ BANKS = [
 ]
 
 
-def main():
+def data_generator_main():
     while True:
         response = input("¿Cuántas personas deseas generar? (Escribe 'salir' para terminar)\n")
 
@@ -92,4 +92,4 @@ def generate_password():
 
 
 if __name__ == "__main__":
-    main()
+    data_generator_main()

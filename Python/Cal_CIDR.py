@@ -22,24 +22,16 @@ def get_prefix_length(ip):
     # Retorna la máscara de subred en formato CIDR
     return mask
 
-def main():
+def calculate_cidr():
     while True:
-        # Lee la dirección IP desde la entrada del usuario
         ip_string = input("\nIngrese una dirección IP (o 'no' para terminar): ")
 
         if ip_string.lower() == "no":
-            # Si el usuario escribe "no", sale del bucle
             break
 
         try:
-            # Convierte la dirección IP a un objeto ipaddress.IPv4Address
             ip = ipaddress.IPv4Address(ip_string)
-
-            # Calcula la máscara de subred en formato CIDR
             prefix_length = get_prefix_length(ip)
             print(f"{ip} / {prefix_length}")
         except ValueError:
             print("Dirección IP inválida. Inténtelo de nuevo.")
-
-if __name__ == "__main__":
-    main()

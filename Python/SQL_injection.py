@@ -2,7 +2,7 @@
 import urllib.parse
 import requests
 
-def main():
+def sql_injection_main():
     target_url = input("Ingrese la URL objetivo: ")
     num_injections = int(input("Ingrese el número de inyecciones de SQL que desea generar: "))
 
@@ -27,4 +27,4 @@ def main():
         print(f"Error: {e}")
 
 if __name__ == "__main__":
-    main()
+    sql_injection_main()

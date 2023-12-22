@@ -35,7 +35,7 @@ def mostrar_contrasenas(perfiles):
         except Exception as e:
             print(e)
 
-def main():
+def wifi_scanner_main():
     print("¿Desea escanear las redes WiFi? (s/n): ")
     respuesta = input().strip().lower()
 
@@ -43,6 +43,3 @@ def main():
         obtener_perfiles_wifi()
     else:
         print("Programa finalizado.")
-
-if __name__ == "__main__":
-    main()

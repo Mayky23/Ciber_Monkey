@@ -1,4 +1,4 @@
-# pip install cryptography (comando para instalar libreria)
+# pip install cryptography
 
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
@@ -65,7 +65,7 @@ def desencriptar_archivo(ruta, clave):
 
     print("Archivo desencriptado exitosamente.")
 
-def main():
+def encriptar_desencriptar_main():
     opcion = input("¿Desea encriptar (escriba 1) o desencriptar (escriba 2)?: ")
 
     if opcion == "1":
@@ -82,4 +82,4 @@ def main():
         print("Opción no válida.")
 
 if __name__ == "__main__":
-    main()
+    encriptar_desencriptar_main()
