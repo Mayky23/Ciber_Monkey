@@ -1,4 +1,6 @@
 # pip install pymysql
+
+"""
 import pymysql
 from pymysql.cursors import DictCursor
 
@@ -233,3 +235,6 @@ def check_plain_text_passwords(connection):
 
 if __name__ == "__main__":
     mysql_audit_main()
+
+    
+"""

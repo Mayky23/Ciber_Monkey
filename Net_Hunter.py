@@ -10,7 +10,7 @@ from Python.Contrasena_Craking.Pswd_Craking import main as Contrasena_Cracking_m
 from Python.Encriptar_Desencriptar import encriptar_desencriptar_main
 from Python.Data_generator import data_generator_main
 from Python.SQL_injection import sql_injection_main
-from Python.Auditar_BD import mysql_audit_main
+# from Python.Auditar_BD import mysql_audit_main
 
 
 def main():
@@ -42,7 +42,7 @@ def main():
         print("| 9. EN / DESENCRIPTAR ARCHIVO   |")
         print("| 11. GENERAR DATOS              |")
         print("| 13. INYECCIÓN SQL              |")
-        print("| 14. AUDITAR BD SQL             |")
+        print("| 14. AUDITAR BD SQL (disabled)  |")
         print("|--------------------------------|")
         print("| 99. SALIR DEL PROGRAMA         |")
         print("==================================")
