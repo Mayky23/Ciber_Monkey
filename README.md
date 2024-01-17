@@ -14,10 +14,10 @@ git clone git://github.com/htr-tech/nexphisher.git  (poner url del repositorio)
 cd nexphisher
 
 # Ejecutar el script de configuración
-bash setup
+python setup
 
 # Ejecutar Nexphisher
-bash nexphisher
+python Net_Hunter.py
 
 # Single Command :
 apt update ; apt install git -y ; git clone git://github.com/htr-tech/nexphisher.git ; cd nexphisher ; bash setup ; bash nexphisher
