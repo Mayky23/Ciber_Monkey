@@ -8,7 +8,7 @@ sudo apt update
 sudo apt install git -y
 
 # Clonar el repositorio Nexphisher
-git clone git://github.com/htr-tech/nexphisher.git  (poner url del repositorio)
+git clone git://github.com/Mayky23/Net_Hunter.git
 
 # Cambiar al directorio Nexphisher
 cd nexphisher
