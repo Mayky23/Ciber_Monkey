@@ -13,7 +13,7 @@ git clone git://github.com/Mayky23/Net_Hunter.git
 # Cambiar al directorio Net_Hunter
 cd Net_Hunter
 
-# Ejecutar Net_Hunter
+. Ejecutar Net_Hunter
 python Net_Hunter.py
 
 - Comando único:
