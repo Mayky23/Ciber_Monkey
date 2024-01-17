@@ -16,5 +16,5 @@ cd Net_Hunter
 # Ejecutar Net_Hunter
 python Net_Hunter.py
 
-# Comando único:
+- Comando único:
 sudo apt update && sudo apt install git -y && git clone git://github.com/Mayky23/Net_Hunter.git && cd Net_Hunter && python Net_Hunter.py
