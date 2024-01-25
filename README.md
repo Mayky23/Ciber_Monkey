@@ -1,4 +1,4 @@
-# 🔐📶⚠️ NET HUNTER 🔐📶⚠️
+# 🔐📶⚠️ CIBER MONKEY 🔐📶⚠️
 - Herramienta de pentesting llamada Net Hunter
 
 - Actualizar el índice de paquetes: 
