@@ -6,18 +6,14 @@ def get_prefix_length(ip):
 
     # Inicializa la máscara de subred y el índice de bits
     mask = 0
-    bit_index = 7
 
     # Itera a través de los bytes de la dirección IP
     for byte in bytes_list:
         # Itera a través de los bits de cada byte
-        for i in range(8):
+        for bit_index in range(8):
             # Si el bit es 1, incrementa la máscara de subred
-            if (byte & (1 << bit_index)) != 0:
+            if (byte & (1 << (7 - bit_index))) != 0:
                 mask += 1
-
-            # Disminuye el índice de bits
-            bit_index -= 1
 
     # Retorna la máscara de subred en formato CIDR
     return mask
@@ -35,3 +31,5 @@ def calculate_cidr():
             print(f"{ip} / {prefix_length}")
         except ValueError:
             print("Dirección IP inválida. Inténtelo de nuevo.")
+
+calculate_cidr()

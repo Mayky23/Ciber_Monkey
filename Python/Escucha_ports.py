@@ -1,15 +1,13 @@
 import socket
 import subprocess
 
-def escucha_puertos():
+def escucha_puertos(puerto, direccion_ip):
     try:
-        port = int(input("Ingrese el puerto: "))
-
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.bind(("", port))
+        server_socket.bind((direccion_ip, puerto))
         server_socket.listen(1)
 
-        print(f"Esperando conexiones entrantes en el puerto {port}...")
+        print(f"Esperando conexiones entrantes en {direccion_ip}:{puerto}...")
 
         client_socket, addr = server_socket.accept()
         print(f"Conexión establecida desde: {addr[0]}:{addr[1]}")
@@ -37,4 +35,10 @@ def escucha_puertos():
         print(f"Ocurrió un error: {e}")
 
 def escucha_puertos_main():
-    escucha_puertos()
+    direccion_ip = input("Ingrese la dirección IP en la que desea estar a la escucha: ")
+    puerto = int(input("Ingrese el puerto en el que desea estar a la escucha: "))
+
+    escucha_puertos(puerto, direccion_ip)
+
+if __name__ == "__main__":
+    escucha_puertos_main()
