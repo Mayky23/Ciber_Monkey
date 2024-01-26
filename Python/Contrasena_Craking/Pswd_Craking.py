@@ -1,145 +1,117 @@
-import hashlib
 import argparse
+import hashlib
 import time
+import itertools
+import os
 
-start_time = time.time()
+def verificar_contraseña(hash, contraseña):
+    return hashlib.sha256(contraseña.encode()).hexdigest().upper() == hash.upper()
 
-def check_password(hash, password):
-	if(hashlib.sha256(password).hexdigest().upper()==hash.upper()):
-		print("PASSWORD CRACKED : "+password)
-		elapsed_time = time.time() - start_time
-		print("Time to crack : "+str(elapsed_time)+" seconds.")
-		quit()
+def fuerza_bruta(hash, longitud_maxima):
+    caracteres = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    for longitud in range(1, longitud_maxima + 1):
+        for contraseña in itertools.product(caracteres, repeat=longitud):
+            if verificar_contraseña(hash, ''.join(contraseña)):
+                return ''.join(contraseña)
 
-def count_print(i):
-	i=i+1
-	if(i%1000000==0):
-		print("Tried "+str(i)+" possibilities.")
-	return i
+def ataque_diccionario(hash, nombre_archivo_diccionario):
+    if not os.path.exists(nombre_archivo_diccionario):
+        return "El archivo de diccionario no existe."
+    with open(nombre_archivo_diccionario) as f:
+        for contraseña in f:
+            if verificar_contraseña(hash, contraseña.strip()):
+                return contraseña.strip()
 
+def ataque_diccionario_con_reemplazos(hash, nombre_archivo_diccionario, reemplazos):
+    if not os.path.exists(nombre_archivo_diccionario):
+        return "El archivo de diccionario no existe."
+    with open(nombre_archivo_diccionario) as f:
+        for contraseña in f:
+            contraseña = contraseña.strip()
+            transformaciones = [contraseña] + [contraseña.replace(*reemplazo) for reemplazo in reemplazos]
+            for t in transformaciones:
+                if verificar_contraseña(hash, t):
+                    return t
 
-### BEGIN BRUTE FORCE ATTACK
+def ataque_dirigido(hash, palabras):
+    for posibilidad in itertools.permutations(palabras):
+        if verificar_contraseña(hash, ''.join(posibilidad)):
+            return ''.join(posibilidad)
 
-chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+def Contrasena_Cracking_main():
+    tiempo_inicio = time.time()
 
-def bruteforce_length(hash, init_password, target_length, current_length, i):
-	if(current_length==target_length):
-		i = count_print(i)
-		check_password(hash, init_password)
-	else:
-		for c in chars:
-			i = bruteforce_length(hash, init_password+c, target_length, current_length+1, i)
-	return i
+    parser = argparse.ArgumentParser(description="Descifrador de contraseñas simple.")
+    parser.add_argument("command", nargs="?", help="Comando a ejecutar (escriba 'help' para obtener ayuda)")
+    parser.add_argument("--hash", help="Hash de la contraseña a descifrar")
+    parser.add_argument("--length_max", type=int, help="Longitud máxima de las contraseñas a probar")
+    parser.add_argument("--dictionary", help="Archivo de diccionario de contraseñas")
+    parser.add_argument("--replacements", help="Reemplazos a aplicar en el diccionario (formato: a/b,c/d,...)")
+    parser.add_argument("--words", help="Lista de palabras para el ataque dirigido")
 
-def bruteforce_attack(hash, max_length):
-	i=0
-	for l in range(1,max_length+1):
-		i = bruteforce_length(hash, "", l, 0, i)
+    args = parser.parse_args()
 
-### END BRUTE FORCE ATTACK
+    if args.command == "help":
+        print(
+			"************************************************************************************************************\n"
+			"*   HELP                                                                                                  *\n"
+			"************************************************************************************************************\n"
+			"* brute_force: Intenta todas las contraseñas alfanuméricas posibles                                        *\n"
+			"* con longitud menor o igual a --length_max.                                                               *\n"
+			"*----------------------------------------------------------------------------------------------------------*\n"
+			"* dict: Intenta todas las contraseñas contenidas en un archivo de                                          *\n"
+			"* diccionario proporcionado por --dictionary.                                                              *\n"
+			"*----------------------------------------------------------------------------------------------------------*\n"
+			"* dict_repl: Intenta todas las contraseñas contenidas en un archivo de diccionario proporcionado por       *\n"
+			"* --dictionary y, para cada contraseña, prueba las contraseñas obtenidas mediante reemplazos dados         *\n"
+			"* por --replacements. Un reemplazo reemplaza todas las ocurrencias del carácter antiguo por el nuevo en    *\n"
+			"* la contraseña.                                                                                           *\n"
+			"*----------------------------------------------------------------------------------------------------------*\n"
+			"* targeted: Intenta todas las posibles permutaciones de todos los                                          *\n"
+			"* posibles subconjuntos de una lista de palabras dada por --words.                                         *\n"
+			"************************************************************************************************************\n"
+)
 
-### BEGIN SIMPLE DICTIONARY ATTACK
+    elif args.command == "brute_force":
+        if not args.hash or not args.length_max:
+            print("Faltan argumentos para el comando brute_force.")
+        else:
+            contraseña = fuerza_bruta(args.hash, args.length_max)
+            if contraseña:
+                print("CONTRASEÑA DESCUBIERTA:", contraseña)
+                print("Tiempo transcurrido:", time.time() - tiempo_inicio, "segundos.")
+            else:
+                print("No se pudo descifrar la contraseña con este método y estos parámetros.")
+    elif args.command == "dict":
+        if not args.hash or not args.dictionary:
+            print("Faltan argumentos para el comando dict.")
+        else:
+            contraseña = ataque_diccionario(args.hash, args.dictionary)
+            if contraseña:
+                print("CONTRASEÑA DESCUBIERTA:", contraseña)
+            else:
+                print("No se pudo descifrar la contraseña con este método y estos parámetros.")
+    elif args.command == "dict_repl":
+        if not args.hash or not args.dictionary or not args.replacements:
+            print("Faltan argumentos para el comando dict_repl.")
+        else:
+            reemplazos = [r.split("/") for r in args.replacements.split(",")]
+            contraseña = ataque_diccionario_con_reemplazos(args.hash, args.dictionary, reemplazos)
+            if contraseña:
+                print("CONTRASEÑA DESCUBIERTA:", contraseña)
+            else:
+                print("No se pudo descifrar la contraseña con este método y estos parámetros.")
+    elif args.command == "targeted":
+        if not args.hash or not args.words:
+            print("Faltan argumentos para el comando targeted.")
+        else:
+            contraseña = ataque_dirigido(args.hash, args.words.split(","))
+            if contraseña:
+                print("CONTRASEÑA DESCUBIERTA:", contraseña)
+            else:
+                print("No se pudo descifrar la contraseña con este método y estos parámetros.")
+    else:
+        print("Comando no reconocido.")
 
-def dictionary_attack(hash, dict_filename):
-	i=0
-	with open(dict_filename) as f:
-		for line in f:
-			i = count_print(i)
-			password = line.rstrip()
-			check_password(hash, password)
-
-### END SIMPLE DICTIONARY ATTACK
-
-### BEGIN DICTIONARY ATTACK WITH REPLACEMENTS
-
-def get_transformations(password, replacements, from_index):
-	if(from_index==len(replacements)):
-		return [password]
-	else:
-		res = []
-		nexts = get_transformations(password, replacements, from_index+1)
-		repl = replacements[from_index]
-		for t in nexts:
-			res.append(t)
-			transformation = t.replace(repl[0], repl[1])
-			if(transformation!=t):
-				res.append(transformation)
-		return res
-
-def dict_attack_with_replacements(hash, dict_filename, replacements):
-	i=0
-	with open(dict_filename) as f:
-		for line in f:
-			i = count_print(i)
-			password = line.rstrip()
-			transformations = get_transformations(password, replacements, 0)
-			for t in transformations:
-				check_password(hash, t)
-
-### END DICTIONARY ATTACK WITH REPLACEMENTS
-
-### BEGIN TARGETED ATTACK
-
-def generate_possibilities(combination, words):
-	result = [combination]
-	for w in words:
-		without = set(words)
-		without.remove(w)
-		new_combination = list(combination)
-		new_combination.append(w)
-		result.extend(generate_possibilities(new_combination, without))
-	return result
-
-def targeted_attack(hash, words):
-	possibilities = map(lambda l: "".join(l), generate_possibilities([], words))
-	i=0
-	for p in possibilities:
-		i = count_print(i)
-		check_password(hash, p)
-
-### END TARGETED ATTACK
-
-parser = argparse.ArgumentParser(description="Simple password cracker. "+ 
-	"Only a proof-of-concept for educational purposes. "+
-	" See github.com/mthambipillai/password-cracker for the full code and documentation.")
-parser.add_argument("hash", help="SHA256 hash of the password to crack.")
-parser.add_argument("method",
-	help="Cracking method to use. Possible values are : brute_force, dict, dict_repl, targeted. ")
-parser.add_argument("-l", "--length_max", type=int, default=5,
-	help="Maximum password length in 'brute_force' method. Default is 5.")
-parser.add_argument("-d", "--dictionary", default="",
-	help="File name of the dictionary to use in 'dict' or 'dict_repl' methods.")
-parser.add_argument("-w", "--words", default="",
-	help="List of words separated by commas. To be used as input to the 'targeted' method.")
-parser.add_argument("-r", "--replacements", default="",
-	help="List of replacements separated by commas. To be used as input to the 'dict_repl' method. "+
-	"Each replacement of a char 'o' by a char 'n' must be written 'o/n'.")
-args = parser.parse_args()
-
-if(args.method=="brute_force"):
-	bruteforce_attack(args.hash, args.length_max)
-elif(args.method=="dict"):
-	if(args.dictionary==""):
-		print("Method 'dict' requires argument 'dictionary'")
-		quit()
-	dictionary_attack(args.hash, args.dictionary)
-elif(args.method=="dict_repl"):
-	if(args.dictionary==""):
-		print("Method 'dict_repl' requires argument 'dictionary'")
-		quit()
-	if(args.replacements==""):
-		print("Method 'dict_repl' requires argument 'replacements'")
-		quit()
-	replacements = map(lambda r: r.split("/"), args.replacements.split(","))
-	dict_attack_with_replacements(args.hash, args.dictionary, replacements)
-elif(args.method=="targeted"):
-	if(args.words==""):
-		print("Method 'targeted' requires argument 'words'")
-		quit()
-	words_set = set(args.words.split(","))
-	targeted_attack(args.hash, words_set)
-else:
-	print("Cracking method '"+args.method+"' doesn't exist.")
-	quit()
-
-print("Failed to crack the password with this method and these parameters.")
+if __name__ == "__main__":
+    Contrasena_Cracking_main()

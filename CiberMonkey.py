@@ -5,7 +5,7 @@ from Python.Dev_IP_act import host_discovery_main
 from Python.Escucha_ports import escucha_puertos_main
 from Python.DDos_atack import ddos_attack_main
 from Python.Pswd_generator import password_generator_main
-from Python.Contrasena_Craking.Pswd_Craking import main as Contrasena_Cracking_main
+from Python.Contrasena_Craking.Pswd_Craking import Contrasena_Cracking_main
 from Python.Encriptar_Desencriptar import encriptar_desencriptar_main
 from Python.Data_generator import data_generator_main
 from Python.SQL_injection import sql_injection_main
