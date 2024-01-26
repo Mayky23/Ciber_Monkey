@@ -6,6 +6,7 @@ from Python.Escucha_ports import escucha_puertos_main
 from Python.DDos_atack import ddos_attack_main
 from Python.Pswd_generator import password_generator_main
 from Python.Contrasena_Craking.Pswd_Craking import Contrasena_Cracking_main
+from Python.Spoofing import Spoofing_main
 from Python.Encriptar_Desencriptar import encriptar_desencriptar_main
 from Python.Data_generator import data_generator_main
 from Python.SQL_injection import sql_injection_main
@@ -55,10 +56,11 @@ def print_menu():
     print("| 5. ATAQUE DDoS                 |")
     print("| 6. CREAR CONTRASEÑA            |")
     print("| 7. CRACKEAR CONTRASEÑA         |")
-    print("| 8. EN / DESENCRIPTAR ARCHIVO   |")
-    print("| 9. GENERAR DATOS               |")
-    print("| 10. INYECCIÓN SQL              |")
-    print("| 11. AUDITAR BD SQL (disabled)  |")
+    print("| 8. SPOOFING                    |")
+    print("| 9. EN / DESENCRIPTAR ARCHIVO   |")
+    print("| 10. GENERAR DATOS              |")
+    print("| 11. INYECCIÓN SQL              |")
+    print("| 12. AUDITAR BD SQL (disabled)  |")
     print("|--------------------------------|")
     print("| 99. SALIR DEL PROGRAMA         |")
     print("==================================")
@@ -72,10 +74,11 @@ def switch_options(option):
         5: ddos_attack_main, 
         6: password_generator_main,
         7: Contrasena_Cracking_main,
-        8: encriptar_desencriptar_main,
-        9: data_generator_main,
-        10: sql_injection_main,
-        # 11: mysql_audit_main,
+        8:Spoofing_main,
+        9: encriptar_desencriptar_main,
+        10: data_generator_main,
+        11: sql_injection_main,
+        # 12: mysql_audit_main,
         99: lambda: print("SALIENDO DEL PROGRAMA...")
     }
 

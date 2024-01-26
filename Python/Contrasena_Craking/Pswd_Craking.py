@@ -14,18 +14,18 @@ def fuerza_bruta(hash, longitud_maxima):
             if verificar_contraseña(hash, ''.join(contraseña)):
                 return ''.join(contraseña)
 
-def ataque_diccionario(hash, nombre_archivo_diccionario):
-    if not os.path.exists(nombre_archivo_diccionario):
+def ataque_diccionario(hash, wordlist):
+    if not os.path.exists(wordlist):
         return "El archivo de diccionario no existe."
-    with open(nombre_archivo_diccionario) as f:
+    with open(wordlist) as f:
         for contraseña in f:
             if verificar_contraseña(hash, contraseña.strip()):
                 return contraseña.strip()
 
-def ataque_diccionario_con_reemplazos(hash, nombre_archivo_diccionario, reemplazos):
-    if not os.path.exists(nombre_archivo_diccionario):
+def ataque_diccionario_con_reemplazos(hash, ordlist, reemplazos):
+    if not os.path.exists(wordlist):
         return "El archivo de diccionario no existe."
-    with open(nombre_archivo_diccionario) as f:
+    with open(wordlist) as f:
         for contraseña in f:
             contraseña = contraseña.strip()
             transformaciones = [contraseña] + [contraseña.replace(*reemplazo) for reemplazo in reemplazos]

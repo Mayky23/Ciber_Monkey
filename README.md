@@ -1,26 +1,37 @@
 # 🔐📶⚠️ CIBER MONKEY 🔐📶⚠️
-- Herramienta de pentesting llamada Net Hunter
+- Herramienta propia de pentesting llamada Ciber Monkey, durante el desarrollo de esta toolBox he aprendido una gran cantidad de cosas sobre las vulnerabilidades existentes, además de desarollar mis habilidades como pentester y programador. 
 
-- Actualizar el índice de paquetes: 
-  
-sudo apt update
 
-- Instalar Git: 
-  
-sudo apt install git -y
+## Ejecutar : 🚀
 
-- Clonar el repositorio Net_Hunter: 
-  
-git clone git://github.com/Mayky23/Net_Hunter.git
+Actualizar paquetes:
 
-- Cambiar al directorio Net_Hunter: 
-  
-cd Net_Hunter
+```bash
+  sudo apt update
+```
+Instalar Git:
 
-- Ejecutar Net_Hunter: 
-  
-python Net_Hunter.py
+```bash
+  sudo apt install git -y
+```
 
-- Comando único:
-  
-sudo apt update && sudo apt install git -y && git clone git://github.com/Mayky23/Net_Hunter.git && cd Net_Hunter && python Net_Hunter.py
+Clonar el repositorio Ciber Monkey:
+
+```bash
+  git clone git://github.com/Mayky23/Ciber_Monkey.git
+```
+
+Ejecutar Ciber Monkey:
+
+```bash
+  python3 CiberMonkey.py
+```
+
+Comando único:
+
+```bash
+  sudo apt update && sudo apt install git -y && git clone git://github.com/Mayky23/Ciber_Monkey.git && python3 CiberMonkey.py
+```
+## Authors : 
+
+- [@Mayky23](https://github.com/Mayky23)
