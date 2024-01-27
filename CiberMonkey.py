@@ -53,6 +53,7 @@ def print_menu():
     print("| 2. WIFI SCANNER                |")
     print("| 3. DESCUBRIR IP ACTIVA         |")
     print("| 4. ESCUCHA DE PUERTOS          |")
+    # print("| 5. LISTAR SUBDOMINIOS        |")  -----> Falta inplementarla
     print("| 5. ATAQUE DDoS                 |")
     print("| 6. CREAR CONTRASEÑA            |")
     print("| 7. CRACKEAR CONTRASEÑA         |")
