@@ -4,6 +4,7 @@ import ipaddress
 
 def listar_ips_activas(direccion_ip):
     """Función para listar todas las direcciones IP activas en la subred local."""
+    
     # Obtenemos la parte de la dirección IP local sin la máscara de red
     direccion_ip_obj = ipaddress.ip_address(direccion_ip)
 

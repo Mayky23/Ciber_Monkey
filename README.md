@@ -4,7 +4,29 @@
 
 ## Ejecutar : 🚀
 
-Actualizar paquetes:
+Actualizar / intalar librerias: 
+pip install requests    
+
+ pip install pywifi          
+ 
+ pip install comtypes        
+ 
+ pip install python-nmap   
+ 
+ pip install pytz            
+ 
+ pip install anytree
+
+ pip install cryptography
+
+ pip install dnspython
+
+pip install ipy
+
+pip install netifaces
+
+
+
 
 ```bash
   sudo apt update
