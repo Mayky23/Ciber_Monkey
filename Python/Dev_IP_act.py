@@ -1,39 +1,44 @@
-import os
+import asyncio
 import platform
 import ipaddress
+import subprocess
 
-def listar_ips_activas(direccion_ip):
+async def ping(ip):
+    if platform.system().lower() == "windows":
+        comando_ping = ["ping", "-n", "1", ip]
+    else:
+        comando_ping = ["ping", "-c", "1", ip]
+
+    proceso = await asyncio.create_subprocess_exec(*comando_ping, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+    stdout, stderr = await proceso.communicate()
+
+    return ip if proceso.returncode == 0 and ("bytes=" in str(stdout)) else None
+
+async def listar_ips_activas(direccion_ip):
     """Función para listar todas las direcciones IP activas en la subred local."""
     
-    # Obtenemos la parte de la dirección IP local sin la máscara de red
     direccion_ip_obj = ipaddress.ip_address(direccion_ip)
-
-    # Construimos la red local a partir de la dirección IP local
     red_local = ipaddress.IPv4Network(f"{direccion_ip_obj}/24", strict=False)
 
     print(f"Escaneando IPs en la subred local {red_local}...\n")
 
-    # Lista para almacenar las IPs activas
     ips_activas = []
 
-    # Iteramos sobre cada dirección IP en la subred local
-    for ip in red_local.hosts():
-        ip = str(ip)
-        if platform.system().lower() == "windows":
-            response = os.system(f"ping -n 1 {ip} > nul")
-        else:
-            response = os.system(f"ping -c 1 {ip} > /dev/null")
+    tasks = []
+    for ip in red_local:
+        tasks.append(ping(str(ip)))
 
-        # Verificamos si la respuesta del ping indica que la IP está activa
-        if response == 0:
-            ips_activas.append(ip)
+    resultados = await asyncio.gather(*tasks)
+    ips_activas = [ip for ip in resultados if ip]
 
     return ips_activas
 
 def host_discovery_main():
-    direccion_ip = input("Inserta IP del host de la red: ").strip()
+    direccion_ip = input("Inserta IP del host de la red (ej:10.192.104.0): ").strip()
 
-    ips_activas = listar_ips_activas(direccion_ip)
+    loop = asyncio.get_event_loop()
+    ips_activas = loop.run_until_complete(listar_ips_activas(direccion_ip))
+    loop.close()
 
     if ips_activas:
         print("\nDirecciones IP activas encontradas en la subred local:")
