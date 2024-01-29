@@ -1,6 +1,7 @@
 import pywifi
 from pywifi import const
 import nmap
+import scapy.all as scapy
 
 # Mapeo de tipos de autenticación para mostrar descripciones más legibles
 TIPOS_AUTENTICACION = {
@@ -19,38 +20,29 @@ TIPOS_CIFRADO = {
 }
 
 def obtener_tipo_autenticacion(akm):
-
     """Función para obtener el tipo de autenticación según el mapeo definido."""
-    if akm in TIPOS_AUTENTICACION:
-        return TIPOS_AUTENTICACION[akm]
-    else:
-        return "Desconocido"
+    return TIPOS_AUTENTICACION.get(akm, "Desconocido")
 
 def obtener_tipo_cifrado(cipher):
-
     """Función para obtener el tipo de cifrado según el mapeo definido."""
-    if cipher in TIPOS_CIFRADO:
-        return TIPOS_CIFRADO[cipher]
-    else:
-        return "Desconocido"
+    return TIPOS_CIFRADO.get(cipher, "Desconocido")
 
-def escanear_redes():
+def escanear_red_lan(subnet):
+    """Función para escanear hosts en la red LAN."""
+    arp_request = scapy.ARP(pdst=subnet)
+    broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
+    arp_request_broadcast = broadcast / arp_request
+    answered_list = scapy.srp(arp_request_broadcast, timeout=1, verbose=False)[0]
 
-    """Función para escanear redes WiFi disponibles."""
-    wifi = pywifi.PyWiFi()
-    iface = wifi.interfaces()[0]
-    
-    iface.scan()
-    resultados = iface.scan_results()
-
-    return resultados
+    hosts = []
+    for element in answered_list:
+        host = {"ip": element[1].psrc}
+        hosts.append(host)
+    return hosts
 
 def escanear_puertos(ip):
-
     """Función para escanear puertos abiertos en una dirección IP."""
     nm = nmap.PortScanner()
-
-    # Escanea todos los puertos en la dirección IP especificada y devuelve los abiertos
     nm.scan(hosts=ip, arguments='-p 1-65535 --open')
     puertos_abiertos = []
     for host in nm.all_hosts():
@@ -59,37 +51,79 @@ def escanear_puertos(ip):
                 puertos_abiertos.append(port)
     return puertos_abiertos
 
+def escanear_redes_wifi():
+    """Función para escanear redes WiFi disponibles."""
+    wifi = pywifi.PyWiFi()
+    iface = wifi.interfaces()[0]
+    iface.scan()
+    return iface.scan_results()
+
 def wifi_scanner_main():
-    
     """Función principal para escanear redes WiFi y sus puertos abiertos."""
-    resultados = escanear_redes()
+    print("************************")
+    print("*   TIPO DE CONEXIÓN:  *")
+    print("************************")
+    print("*      1. LAN          *")
+    print("*                      *")
+    print("*      2. WiFi         *")
+    print("************************")
 
-    if len(resultados) == 0:
-        print("No se encontraron redes WiFi disponibles.")
-        return
+    opcion = input("Seleccione el tipo de conexión (1/2): ").strip()
 
-    print("Redes WiFi disponibles:")
-    for resultado in resultados:
-        nombre_red = resultado.ssid
-        seguridad = obtener_tipo_autenticacion(resultado.akm[0])
-        cifrado = obtener_tipo_cifrado(resultado.cipher[0])
+    if opcion == "1":
+        subnet = input("Ingrese la subred de su LAN (por ejemplo, 192.168.1.0/24): ").strip()
+        hosts = escanear_red_lan(subnet)
 
-        print(f"Nombre: {nombre_red}")
-        print(f"Tipo de seguridad: {seguridad}")
-        print(f"Tipo de cifrado: {cifrado}")
-        
-        # Obtener dirección IP del punto de acceso
-        ip = resultado.bssid
-        
-        # Escanear puertos abiertos en la red
-        puertos_abiertos = escanear_puertos(ip)
-        if puertos_abiertos:
-            print("Puertos abiertos:")
-            for puerto in puertos_abiertos:
-                print(f"    Puerto: {puerto}")
-        else:
-            print("No se encontraron puertos abiertos en esta red.")
-        
-        print("----------------------------------------------------------------------------------")
+        if not hosts:
+            print("No se encontraron hosts en la red LAN.")
+            return
 
-wifi_scanner_main()
+        print("Hosts en la red LAN:")
+        for host in hosts:
+            print("IP:", host["ip"])
+
+            puertos_abiertos = escanear_puertos(host["ip"])
+            if puertos_abiertos:
+                print("Puertos abiertos:")
+                for puerto in puertos_abiertos:
+                    print("    Puerto:", puerto)
+            else:
+                print("No se encontraron puertos abiertos en este host.")
+
+            print("----------------------------------------------")
+
+    elif opcion == "2":
+        resultados = escanear_redes_wifi()
+        if not resultados:
+            print("No se encontraron redes WiFi disponibles.")
+            return
+
+        print("Redes WiFi disponibles:")
+        for resultado in resultados:
+            nombre_red = resultado.ssid
+            seguridad = obtener_tipo_autenticacion(resultado.akm[0])
+            cifrado = obtener_tipo_cifrado(resultado.cipher[0])
+
+            print(f"Nombre: {nombre_red}")
+            print(f"Tipo de seguridad: {seguridad}")
+            print(f"Tipo de cifrado: {cifrado}")
+
+            # Obtener dirección IP del punto de acceso  
+            ip = resultado.bssid
+
+            # Escanear puertos abiertos en la red
+            puertos_abiertos = escanear_puertos(ip)
+            if puertos_abiertos:
+                print("Puertos abiertos:")
+                for puerto in puertos_abiertos:
+                    print(f"    Puerto: {puerto}")
+            else:
+                print("No se encontraron puertos abiertos en esta red.")
+
+            print("----------------------------------------------")
+
+    else:
+        print("Opción no válida.")
+
+if __name__ == "__main__":
+    wifi_scanner_main()

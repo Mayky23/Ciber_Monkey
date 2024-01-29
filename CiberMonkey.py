@@ -3,6 +3,7 @@ from Python.Cal_CIDR import calculate_cidr
 from Python.Wifi_Scanner import wifi_scanner_main
 from Python.Dev_IP_act import host_discovery_main
 from Python.Escucha_ports import escucha_puertos_main
+from Python.ListarSubdominios.sublist3r import interactive
 from Python.DDos_atack import ddos_attack_main
 from Python.Pswd_generator import password_generator_main
 from Python.Contrasena_Craking.Pswd_Craking import Contrasena_Cracking_main
@@ -53,15 +54,15 @@ def print_menu():
     print("| 2. WIFI SCANNER                |")
     print("| 3. DESCUBRIR IP ACTIVA         |")
     print("| 4. ESCUCHA DE PUERTOS          |")
-    # print("| 5. LISTAR SUBDOMINIOS        |")  -----> Falta inplementarla
-    print("| 5. ATAQUE DDoS                 |")
-    print("| 6. CREAR CONTRASEÑA            |")
-    print("| 7. CRACKEAR CONTRASEÑA         |")
-    print("| 8. SPOOFING                    |")
-    print("| 9. EN / DESENCRIPTAR ARCHIVO   |")
-    print("| 10. GENERAR DATOS              |")
-    print("| 11. INYECCIÓN SQL              |")
-    print("| 12. AUDITAR BD SQL (disabled)  |")
+    print("| 5. LISTAR SUBDOMINIOS          |")
+    print("| 6. ATAQUE DDoS                 |")
+    print("| 7. CREAR CONTRASEÑA            |")
+    print("| 8. CRACKEAR CONTRASEÑA         |")
+    print("| 9. SPOOFING                    |")
+    print("| 10. EN / DESENCRIPTAR ARCHIVO  |")
+    print("| 11. GENERAR DATOS              |")
+    print("| 12. INYECCIÓN SQL              |")
+    print("| 13. AUDITAR BD SQL (disabled)  |")
     print("|--------------------------------|")
     print("| 99. SALIR DEL PROGRAMA         |")
     print("==================================")
@@ -72,14 +73,15 @@ def switch_options(option):
         2: wifi_scanner_main, 
         3: host_discovery_main,
         4: escucha_puertos_main,
-        5: ddos_attack_main, 
-        6: password_generator_main,
-        7: Contrasena_Cracking_main,
-        8:Spoofing_main,
-        9: encriptar_desencriptar_main,
-        10: data_generator_main,
-        11: sql_injection_main,
-        # 12: mysql_audit_main,
+        5: interactive, 
+        6: ddos_attack_main, 
+        7: password_generator_main,
+        8: Contrasena_Cracking_main,
+        9:Spoofing_main,
+        10: encriptar_desencriptar_main,
+        11: data_generator_main,
+        12: sql_injection_main,
+        # 13: mysql_audit_main,
         99: lambda: print("SALIENDO DEL PROGRAMA...")
     }
 
