@@ -1,3 +1,8 @@
+# RuntimeError: Sniffing and sending packets is not available at layer 2: winpcap is not installed. You may use conf.L3socket orconf.L3socket6 to access layer 3
+# scapy.runtime 2024-01-29 23:38:49,569 WARNING WinPcap is now deprecated (not maintained). Please use Npcap instead
+
+# Programas instalados en local : Nmap y WinPcap
+
 import pywifi
 from pywifi import const
 import nmap
