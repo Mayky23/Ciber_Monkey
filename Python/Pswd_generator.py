@@ -40,5 +40,18 @@ def password_generator_main():
         else:
             print("Opción inválida. Inténtelo de nuevo.")
 
+def banner():
+    cartel = r"""
+   ___              _                              _           
+  | _ \____ __ ____| |  __ _ ___ _ _  ___ _ _ __ _| |_ ___ _ _ 
+  |  _(_-< V  V / _` | / _` / -_) ' \/ -_) '_/ _` |  _/ _ \ '_|
+  |_| /__/\_/\_/\__,_| \__, \___|_||_\___|_| \__,_|\__\___/_|  
+                       |___/                                                                        
+    """
+    print(cartel)
+
 if __name__ == "__main__":
+
+    banner()
+    print("***************************************************************")
     password_generator_main()

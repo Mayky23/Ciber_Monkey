@@ -89,5 +89,19 @@ def ddos_attack_main():
     except KeyboardInterrupt:
         print("\nAtaque DDoS interrumpido.")
 
+
+def banner():
+    cartel = r"""
+    ___  ___      ___     _  _   _           _   
+   |   \|   \ ___/ __|   /_\| |_| |_ __ _ __| |__
+   | |) | |) / _ \__ \  / _ \  _|  _/ _` / _| / /
+   |___/|___/\___/___/ /_/ \_\__|\__\__,_\__|_\_\                                            
+                                             
+    """
+    print(cartel)
+
 if __name__ == "__main__":
+
+    banner()
+    print("**************************************************")
     ddos_attack_main()

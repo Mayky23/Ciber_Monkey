@@ -40,5 +40,18 @@ def escucha_puertos_main():
 
     escucha_puertos(puerto, direccion_ip)
 
+def banner():
+    cartel = r"""
+   ___         _     _    _    _                    
+  | _ \___ _ _| |_  | |  (_)__| |_ ___ _ _  ___ _ _ 
+  |  _/ _ \ '_|  _| | |__| (_-<  _/ -_) ' \/ -_) '_|
+  |_| \___/_|  \__| |____|_/__/\__\___|_||_\___|_|  
+                                       
+    """
+    print(cartel)
+
 if __name__ == "__main__":
+
+    banner()
+    print("***********************************************************")
     escucha_puertos_main()

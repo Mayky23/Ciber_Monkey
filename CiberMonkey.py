@@ -7,7 +7,7 @@ from Python.ListarSubdominios.sublist3r import interactive
 from Python.DDos_atack import ddos_attack_main
 from Python.Pswd_generator import password_generator_main
 from Python.Wifi_pswd.WifiBF import menu
-from Python.Wifi_atack import script_banner, menu_panel, check_parms
+from Python.Wifi_atack import wifiCrack
 from Python.Spoofing import Spoofing_main
 from Python.Encriptar_Desencriptar import encriptar_desencriptar_main
 from Python.Data_generator import data_generator_main
@@ -79,7 +79,7 @@ def switch_options(option):
         6: ddos_attack_main, 
         7: password_generator_main,
         8: menu,
-        9: lambda: (script_banner(), menu_panel(), check_parms()),  # Llama a múltiples funciones
+        9: lambda: (wifiCrack),  # Llama a múltiples funciones, poniendo solo el nombre del main
         10: Spoofing_main,
         11: encriptar_desencriptar_main,
         12: data_generator_main,

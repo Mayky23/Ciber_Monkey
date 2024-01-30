@@ -33,7 +33,21 @@ async def listar_ips_activas(direccion_ip):
 
     return ips_activas
 
+def banner():
+    cartel = r"""
+     _      _   _           ___ ___ 
+    /_\  __| |_(_)_ _____  |_ _| _ \
+   / _ \/ _|  _| \ V / -_)  | ||  _/
+  /_/ \_\__|\__|_|\_/\___| |___|_|  
+                                       
+    """
+    print(cartel)
+
 def host_discovery_main():
+
+    banner()
+    print("************************************************")
+    
     direccion_ip = input("Inserta IP del host de la red (ej:10.192.104.0): ").strip()
 
     loop = asyncio.get_event_loop()

@@ -1,4 +1,3 @@
-
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
@@ -80,5 +79,25 @@ def encriptar_desencriptar_main():
     else:
         print("Opción no válida.")
 
+def mostrar_menu():
+    print("************************")
+    print("*         FILE         *")
+    print("************************")
+    print("*    1. Encriptar      *")
+    print("*                      *")
+    print("*    2. Desencriptar   *")
+    print("************************")
+
+def banner():
+    cartel = r"""
+   ___ _ _        ___                  _ _           
+  | __(_) |___   / __|_  _ __ _ _ _ __| (_)__ _ _ _  
+  | _|| | / -_) | (_ | || / _` | '_/ _` | / _` | ' \ 
+  |_| |_|_\___|  \___|\_,_\__,_|_| \__,_|_\__,_|_||_|
+    """
+    print(cartel)
+    mostrar_menu()  # Llama a la función mostrar_menu() aquí
+
 if __name__ == "__main__":
+    banner()
     encriptar_desencriptar_main()

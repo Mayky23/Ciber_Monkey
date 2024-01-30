@@ -7,6 +7,18 @@ import sys
 import os
 from time import sleep
 
+
+def banner():
+    cartel = r"""
+   ___                 __ _           
+  / __|_ __  ___  ___ / _(_)_ _  __ _ 
+  \__ \ '_ \/ _ \/ _ \  _| | ' \/ _` |
+  |___/ .__/\___/\___/_| |_|_||_\__, |
+      |_|                       |___/ 
+                                             
+    """
+    print(cartel)
+
 def Spoofing_main():
     if len(sys.argv) != 4:
         print("\nUsage: python " + sys.argv[0] + " <area-code> <phone-number> <login-pin>\n")
@@ -178,4 +190,7 @@ def Spoofing_main():
         print("\nInvalid Option\n")
 
 if __name__ == "__main__":
+
+    banner()
+    print("**************************************")
     Spoofing_main()

@@ -102,6 +102,17 @@ def generate_password():
     password = ''.join(random.choice(characters) for _ in range(length))
     return password
 
+def banner():
+    cartel = r"""
+  ___       _           ___                       _           
+ |   \ __ _| |_ __ _   / __|___ _ _  ___ _ _ __ _| |_ ___ _ _ 
+ | |) / _` |  _/ _` | | (_ / -_) ' \/ -_) '_/ _` |  _/ _ \ '_|
+ |___/\__,_|\__\__,_|  \___\___|_||_\___|_| \__,_|\__\___/_|  
+                                                              
+    """
+    print(cartel)
 
 if __name__ == "__main__":
+    banner()
+    print("**************************************************************")
     data_generator_main()

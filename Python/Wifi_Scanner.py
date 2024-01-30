@@ -63,8 +63,22 @@ def escanear_redes_wifi():
     iface.scan()
     return iface.scan_results()
 
+def banner():
+    cartel = r"""
+  __      ___  __ _   ___                            
+  \ \    / (_)/ _(_) / __| __ __ _ _ _  _ _  ___ _ _ 
+   \ \/\/ /| |  _| | \__ \/ _/ _` | ' \| ' \/ -_) '_|
+    \_/\_/ |_|_| |_| |___/\__\__,_|_||_|_||_\___|_|  
+                                                                                          
+    """
+    print(cartel)
+
+
 def wifi_scanner_main():
     """Función principal para escanear redes WiFi y sus puertos abiertos."""
+
+    banner()
+
     print("************************")
     print("*   TIPO DE CONEXIÓN:  *")
     print("************************")
