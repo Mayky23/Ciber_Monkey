@@ -6,7 +6,8 @@ from Python.Escucha_ports import escucha_puertos_main
 from Python.ListarSubdominios.sublist3r import interactive
 from Python.DDos_atack import ddos_attack_main
 from Python.Pswd_generator import password_generator_main
-from Python.Contrasena_Craking.Pswd_Craking import Contrasena_Cracking_main
+from Python.Wifi_pswd.WifiBF import menu
+from Python.Wifi_atack import script_banner, menu_panel, check_parms
 from Python.Spoofing import Spoofing_main
 from Python.Encriptar_Desencriptar import encriptar_desencriptar_main
 from Python.Data_generator import data_generator_main
@@ -57,7 +58,8 @@ def print_menu():
     print("| 5. LISTAR SUBDOMINIOS          |")
     print("| 6. ATAQUE DDoS                 |")
     print("| 7. CREAR CONTRASEÑA            |")
-    print("| 8. CRACKEAR CONTRASEÑA         |")
+    print("| 8. CRACKEAR PSWD WIFI          |")
+    print("| 8. ATACAR WIFI                 |")
     print("| 9. SPOOFING                    |")
     print("| 10. EN / DESENCRIPTAR ARCHIVO  |")
     print("| 11. GENERAR DATOS              |")
@@ -76,12 +78,13 @@ def switch_options(option):
         5: interactive, 
         6: ddos_attack_main, 
         7: password_generator_main,
-        8: Contrasena_Cracking_main,
-        9:Spoofing_main,
-        10: encriptar_desencriptar_main,
-        11: data_generator_main,
-        12: sql_injection_main,
-        # 13: mysql_audit_main,
+        8: menu,
+        9: lambda: (script_banner(), menu_panel(), check_parms()),  # Llama a múltiples funciones
+        10: Spoofing_main,
+        11: encriptar_desencriptar_main,
+        12: data_generator_main,
+        13: sql_injection_main,
+        # 14: mysql_audit_main,
         99: lambda: print("SALIENDO DEL PROGRAMA...")
     }
 
