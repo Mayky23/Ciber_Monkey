@@ -66,6 +66,12 @@ pip install subbrute
   sudo apt update && sudo apt install git -y && git clone git://github.com/Mayky23/Ciber_Monkey.git && python3 CiberMonkey.py
 ```
 
+
+![Texto alternativo](URL_de_la_imagen)
+
+![Texto alternativo](URL_de_la_imagen)
+
+
 ## Authors : 
 
 - [@Mayky23](https://github.com/Mayky23)

@@ -1,5 +1,5 @@
 import os
-from Python import Cal_CIDR
+# from Python import Cal_CIDR
 from Python import Wifi_Scanner
 from Python import Dev_IP_act
 from Python import Escucha_ports
@@ -67,7 +67,7 @@ def main():
 
 def switch_options(option):
     options_dict = {
-        1: Cal_CIDR,
+       #  1: Cal_CIDR,
         2: Wifi_Scanner,
         3: Dev_IP_act,
         4: Escucha_ports,
@@ -95,4 +95,5 @@ def clear_screen():
     print_menu()
 
 if __name__ == "__main__":
+    clear_screen()
     main()
