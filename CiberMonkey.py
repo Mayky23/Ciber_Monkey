@@ -13,23 +13,6 @@ from Python.Encriptar_Desencriptar import encriptar_desencriptar_main
 from Python.Data_generator import data_generator_main
 from Python.SQL_injection import sql_injection_main
 
-def main():
-    clear_screen()
-    print_ascii_art()
-    print_menu()
-
-    while True:
-        try:
-            option = int(input("\nSELECCIONA UNA OPCIÓN: "))
-            if option == 99:
-                print("SALIENDO DEL PROGRAMA...")
-                break
-            switch_options(option)
-        except ValueError:
-            print("Por favor, ingresa un número válido.")
-
-def clear_screen():
-    os.system("cls" if os.name == "nt" else "clear")
 
 def print_ascii_art():
     ascii_art = """
@@ -69,6 +52,25 @@ def print_menu():
     print("| 99. SALIR DEL PROGRAMA         |")
     print("==================================")
 
+
+def main():
+    print_ascii_art()
+    print_menu()
+
+    while True:
+        try:
+            option = int(input("\nSELECCIONA UNA OPCIÓN: "))
+            if option == 99:
+                print("SALIENDO DEL PROGRAMA...")
+                break
+            switch_options(option)
+        except ValueError:
+            print("Por favor, ingresa un número válido.")
+
+def clear_screen():
+    os.system("cls" if os.name == "nt" else "clear")
+ 
+
 def switch_options(option):
     options_dict = {
         1: calculate_cidr,
@@ -97,7 +99,7 @@ def switch_options(option):
         print_ascii_art()
         print_menu()
     except Exception as e:
-        print(f"Se produjo un error: {e}")
+        print(f"Se produjo un error: {e}") 
 
 if __name__ == "__main__":
     main()

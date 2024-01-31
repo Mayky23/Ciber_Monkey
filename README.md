@@ -13,7 +13,7 @@ Actualizar/Instalar librerías con apt:
 
 ### Instalar librerías de Python con pip:
 ```bash
-  pip install requests pywifi comtypes python-nmap pytz anytree cryptography dnspython ipy netifaces scapy libpcap pypcap colorama
+  pip install requests pywifi comtypes python-nmap pytz anytree cryptography dnspython ipy netifaces scapy libpcap pypcap colorama subbrute
 ```
 
 pip install requests    
@@ -44,7 +44,7 @@ pip install pypcap
 
 pip install colorama
 
-
+pip install subbrute
 
 ### Instalar Git:
 ```bash
