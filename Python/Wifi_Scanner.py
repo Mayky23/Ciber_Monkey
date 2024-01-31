@@ -1,8 +1,3 @@
-# RuntimeError: Sniffing and sending packets is not available at layer 2: winpcap is not installed. You may use conf.L3socket orconf.L3socket6 to access layer 3
-# scapy.runtime 2024-01-29 23:38:49,569 WARNING WinPcap is now deprecated (not maintained). Please use Npcap instead
-
-# Programas instalados en local : Nmap y WinPcap
-
 import pywifi
 from pywifi import const
 import nmap
@@ -51,7 +46,7 @@ def escanear_puertos(ip):
     nm.scan(hosts=ip, arguments='-p 1-65535 --open')
     puertos_abiertos = []
     for host in nm.all_hosts():
-        if nm[host].has_tcp(ports=''):
+        if 'tcp' in nm[host]:
             for port in nm[host]['tcp'].keys():
                 puertos_abiertos.append(port)
     return puertos_abiertos
@@ -65,14 +60,13 @@ def escanear_redes_wifi():
 
 def banner():
     cartel = r"""
-  __      ___  __ _   ___                            
-  \ \    / (_)/ _(_) / __| __ __ _ _ _  _ _  ___ _ _ 
+  __      ___  __ _   ___
+  \ \    / (_)/ _(_) / __| __ __ _ _ _  _ _  ___ _ _
    \ \/\/ /| |  _| | \__ \/ _/ _` | ' \| ' \/ -_) '_|
-    \_/\_/ |_|_| |_| |___/\__\__,_|_||_|_||_\___|_|  
-                                                                                          
+    \_/\_/ |_|_| |_| |___/\__\__,_|_||_|_||_\___|_|
+
     """
     print(cartel)
-
 
 def wifi_scanner_main():
     """Función principal para escanear redes WiFi y sus puertos abiertos."""
