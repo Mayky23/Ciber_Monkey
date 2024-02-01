@@ -1,6 +1,5 @@
 # pip install pymysql
 
-"""
 import pymysql
 from pymysql.cursors import DictCursor
 
@@ -233,8 +232,19 @@ def check_plain_text_passwords(connection):
     except pymysql.Error as e:
         print(f"Error al verificar contraseñas almacenadas en texto plano: {e}")
 
-if __name__ == "__main__":
-    mysql_audit_main()
+def banner():
+    cartel = r"""
+     ___  ___   ___                      _   
+    |   \| _ ) |_ _|_ _  ____ __  ___ __| |_ 
+    | |) | _ \  | || ' \(_-< '_ \/ -_) _|  _|
+    |___/|___/ |___|_||_/__/ .__/\___\__|\__|
+                           |_|               
+                                                                     
+    """
+    print(cartel)
 
+if __name__ == "__main__":
+    banner()
+    print("***************************************************************") 
+    mysql_audit_main()
     
-"""
