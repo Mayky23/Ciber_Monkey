@@ -753,4 +753,10 @@ def check_parms():
     else:
         script_banner()
         menu_panel()
-check_parms()
+
+def main():
+    check_parms()
+
+if __name__ == "__main__":
+    main()
+

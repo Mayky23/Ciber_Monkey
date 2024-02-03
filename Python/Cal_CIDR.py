@@ -1,4 +1,6 @@
+import os
 import ipaddress
+from colorama import *
 
 def get_prefix_length(ip):
     # Obtiene la dirección IP en forma de lista de bytes
@@ -27,15 +29,15 @@ def banner():
      \___\__,_|_\__|  \___|___|___/|_|_\
                                              
     """
-    print(cartel)
+    clear_screen()
+    print(Fore.BLUE + cartel)
 
 def calculate_cidr():
-    
-    banner()
-    
     while True:
+        clear_screen()  # Limpiar la pantalla antes de solicitar la dirección IP
+        banner()
         print("************************************************")
-        ip_string = input("\nIngrese una dirección IP (o 'n' para terminar): ")
+        ip_string = input(Style.RESET_ALL +"\nIngrese una dirección IP (o 'n' para terminar): ")
 
         if ip_string.lower() == "n":
             break
@@ -43,8 +45,16 @@ def calculate_cidr():
         try:
             ip = ipaddress.IPv4Address(ip_string)
             prefix_length = get_prefix_length(ip)
-            print(f"{ip} / {prefix_length}")
+            print(f"{ip}/{prefix_length}")
+            input(Style.RESET_ALL +"Presione Enter para continuar...")
         except ValueError:
-            print("Dirección IP inválida. Inténtelo de nuevo.")
+            print(Fore.BLACK + Back.RED + "Dirección IP inválida. Inténtelo de nuevo.")
+            input(Style.RESET_ALL +"Presione Enter para continuar...")
+            continue  # Volver a solicitar una dirección IP válida
 
-calculate_cidr()
+def clear_screen():
+    os.system("cls" if os.name == "nt" else "clear")
+
+if __name__ == "__main__":
+    clear_screen()
+    calculate_cidr()

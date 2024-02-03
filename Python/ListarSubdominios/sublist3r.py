@@ -16,7 +16,7 @@ import json
 from collections import Counter
 
 # external modules
-from subbrute import subbrute
+from urllib.parse import urlparse
 import dns.resolver
 import requests
 

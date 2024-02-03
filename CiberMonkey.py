@@ -1,5 +1,5 @@
 import os
-from Python import Cal_CIDR
+from Python.Cal_CIDR import calculate_cidr_main
 from Python import Wifi_Scanner
 from Python import Dev_IP_act
 from Python import Escucha_ports
@@ -14,8 +14,10 @@ from Python import Encriptar_Desencriptar
 from Python import Data_generator
 from Python import SQL_injection
 
+from colorama import *
+
 def print_ascii_art():
-    ascii_art = """
+    ascii_art = Fore.CYAN + Style.BRIGHT + r"""
        ____       ___                             ___       ___                  ___                          
       6MMMMb/  68b MM                             `MMb     dMM'                  `MM                          
      8P    YM  Y89 MM                              MMM.   ,PMM                    MM                          
@@ -33,18 +35,19 @@ def print_ascii_art():
     print(ascii_art)
 
 def print_menu():
+  
     print("\n==================================")
     print("| 1. CALCULAR CIDR               |")
     print("| 2. WIFI SCANNER                |")
     print("| 3. DESCUBRIR IP ACTIVA         |")
     print("| 4. ESCUCHA DE PUERTOS          |")
-    print("| 5. LISTAR SUBDOMINIOS          |")
-    print("| 6. ATAQUE DDoS                 |")
-    print("| 7. CREAR CONTRASEÑA            |")
-    print("| 8. CRACKEAR PSWD WIFI          |")
-    print("| 9. ATACAR WIFI                 |")
+    print("| 5. CRACKEAR PSWD WIFI          |")
+    print("| 6. ATACAR WIFI                 |")
+    print("| 7. LISTAR SUBDOMINIOS          |")
+    print("| 8. ATAQUE DDoS                 |")
+    print("| 9. CREAR CONTRASEÑA            |")
     print("| 10. SPOOFING                   |")
-    print("| 11. BACK DOOR                  |")
+    print("| 11. BACKDOOR                   |")
     print("| 12. EN / DESENCRIPTAR ARCHIVO  |")
     print("| 13. GENERAR DATOS              |")
     print("| 14. INYECCIÓN SQL              |")
@@ -54,11 +57,12 @@ def print_menu():
     print("==================================")
 
 def main():
-    print_ascii_art()
-    print_menu()
 
-    while True:
+    while True:    
         try:
+            clear_screen()
+            print_ascii_art()
+            print_menu()       
             option = int(input("\nSELECCIONA UNA OPCIÓN: "))
             if option == 99:
                 print("SALIENDO DEL PROGRAMA...")
@@ -69,21 +73,21 @@ def main():
 
 def switch_options(option):
     options_dict = {
-        1: Cal_CIDR,
+        1: calculate_cidr_main,
         2: Wifi_Scanner,
         3: Dev_IP_act,
         4: Escucha_ports,
-        5: sublist3r,
-        6: DDos_atack,
-        7: Pswd_generator,
-        8: menu,
-        9: wifiCrack,
+        5: menu,
+        6: wifiCrack,
+        7: sublist3r,
+        8: DDos_atack,
+        9: Pswd_generator,
         10: Spoofing,
-        10: Backdoor,
-        11: Encriptar_Desencriptar,
-        12: Data_generator,
-        13: SQL_injection,
-        # 14: mysql_audit_main,
+        11: Backdoor,
+        12: Encriptar_Desencriptar,
+        13: Data_generator,
+        14: SQL_injection,
+        # 15: mysql_audit_main,
         99: print("SALIENDO DEL PROGRAMA...")
     }
     func = options_dict.get(option)
@@ -94,8 +98,6 @@ def switch_options(option):
 
 def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")
-    print_ascii_art()
-    print_menu()
 
 if __name__ == "__main__":
     main()
