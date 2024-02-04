@@ -1,7 +1,7 @@
 import os
-from Python.Cal_CIDR import calculate_cidr_main
-from Python import Wifi_Scanner
-from Python import Dev_IP_act
+from Python.Cal_CIDR import calculate_cidr
+from Python.Wifi_Scanner import wifi_scanner_main
+from Python.Dev_IP_act import host_discovery_main
 from Python import Escucha_ports
 from Python.ListarSubdominios import sublist3r 
 from Python import DDos_atack
@@ -17,8 +17,8 @@ from Python import SQL_injection
 from colorama import *
 
 def print_ascii_art():
-    ascii_art = Fore.CYAN + Style.BRIGHT + r"""
-       ____       ___                             ___       ___                  ___                          
+    ascii_art = r"""
+       ____        __                             ___       ___                  ___                          
       6MMMMb/  68b MM                             `MMb     dMM'                  `MM                          
      8P    YM  Y89 MM                              MMM.   ,PMM                    MM                          
     6M      Y  ___ MM____     ____  ___  __        M`Mb   d'MM   _____  ___  __   MM   __   ____  ____    ___ 
@@ -32,7 +32,7 @@ def print_ascii_art():
        ----Por: MARH----------------------------------------------------------------------------- (8),P       
                                                                                                    YMM        
     """
-    print(ascii_art)
+    print(Fore.CYAN + Style.BRIGHT +  ascii_art)
 
 def print_menu():
   
@@ -73,9 +73,9 @@ def main():
 
 def switch_options(option):
     options_dict = {
-        1: calculate_cidr_main,
-        2: Wifi_Scanner,
-        3: Dev_IP_act,
+        1: calculate_cidr,
+        2: wifi_scanner_main,
+        3: host_discovery_main,
         4: Escucha_ports,
         5: menu,
         6: wifiCrack,
