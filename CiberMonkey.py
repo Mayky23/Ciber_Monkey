@@ -2,7 +2,7 @@ import os
 from Python.Cal_CIDR import calculate_cidr
 from Python.Wifi_Scanner import wifi_scanner_main
 from Python.Dev_IP_act import host_discovery_main
-from Python import Escucha_ports
+from Python.Escucha_ports import escucha_puertos_main
 from Python.ListarSubdominios import sublist3r 
 from Python import DDos_atack
 from Python import Pswd_generator
@@ -76,7 +76,7 @@ def switch_options(option):
         1: calculate_cidr,
         2: wifi_scanner_main,
         3: host_discovery_main,
-        4: Escucha_ports,
+        4: escucha_puertos_main,
         5: menu,
         6: wifiCrack,
         7: sublist3r,

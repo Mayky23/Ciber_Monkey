@@ -74,6 +74,7 @@ def banner():
     \_/\_/ |_|_| |_| |___/\__\__,_|_||_|_||_\___|_|
 
     """
+    clear_screen()
     print(Fore.LIGHTMAGENTA_EX + Style.BRIGHT + cartel)
 
 def wifi_scanner_main():
@@ -146,5 +147,9 @@ def wifi_scanner_main():
     else:
         print(Fore.BLACK + Back.RED +"Opción no válida.")
 
+def clear_screen():
+    os.system("cls" if os.name == "nt" else "clear")
+
 if __name__ == "__main__":
+    clear_screen()
     wifi_scanner_main()
