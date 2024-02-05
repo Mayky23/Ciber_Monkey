@@ -1,5 +1,6 @@
 import os
 import ipaddress
+
 from colorama import *
 
 def get_prefix_length(ip):

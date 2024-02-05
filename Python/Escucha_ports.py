@@ -38,6 +38,7 @@ def escucha_puertos(puerto, direccion_ip):
         print(f"Ocurrió un error: {e}")
         input(Style.RESET_ALL + "Presione Enter para continuar...")
         clear_screen()
+        
 
 def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")

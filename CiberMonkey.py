@@ -3,11 +3,11 @@ from Python.Cal_CIDR import calculate_cidr
 from Python.Wifi_Scanner import wifi_scanner_main
 from Python.Dev_IP_act import host_discovery_main
 from Python.Escucha_ports import escucha_puertos_main
-from Python.ListarSubdominios import sublist3r 
+from Python.Wifi_pswd.WifiBF import crack_wifi_pswd_main
+from Python.Wifi_atack.wifiCrack import wifi_atack_main
+from Python.ListarSubdominios.sublist3r import interactive
 from Python import DDos_atack
 from Python import Pswd_generator
-from Python.Wifi_pswd.WifiBF import menu
-from Python.Wifi_atack import wifiCrack
 from Python import Spoofing
 from Python import Backdoor
 from Python import Encriptar_Desencriptar
@@ -17,26 +17,19 @@ from Python import SQL_injection
 from colorama import *
 
 def print_ascii_art():
+
     ascii_art = r"""
-       ____        __                             ___       ___                  ___                          
-      6MMMMb/  68b MM                             `MMb     dMM'                  `MM                          
-     8P    YM  Y89 MM                              MMM.   ,PMM                    MM                          
-    6M      Y  ___ MM____     ____  ___  __        M`Mb   d'MM   _____  ___  __   MM   __   ____  ____    ___ 
-    MM          MM MM'  `Mb 6M'  `Mb MM699         M `Mb d' MM 6M'   `Mb MMM9 `Mb MM  d'  6M'  `Mb `Mb     d' 
-    MM          MM MM    MM MM    MM MM'           M  YM.P  MM MM     MM MM'   MM MM d'   MM    MM  YM.  ,P   
-    MM          MM MM    MM MMMMMMMM MM            M  `Mb'  MM MM     MM MM    MM MMdM.   MMMMMMMM   MM  M    
-    YM      6   MM MM    MM MM       MM            M   YP   MM MM     MM MM    MM MMPYM.  MM         `Mbd'    
-      8b    d9  MM MM.  ,M9 YM    d9 MM            M   `'   MM YM.   ,M9 MM    MM MM  YM. YM    d9    YMP     
-       YMMMM9  _MM_MYMMMM9   YMMMM9 _MM_          _M_      _MM_ YMMMMM9 _MM_  _MM_MM_  YM._YMMMM9      M      
-                                                                                                      d'      
-       ----Por: MARH----------------------------------------------------------------------------- (8),P       
-                                                                                                   YMM        
+     ___  _  _                 __  __             _              
+    / __|(_)| |__  ___  _ _   |  \/  | ___  _ _  | |__ ___  _  _ 
+   | (__ | || '_ \/ -_)| '_|  | |\/| |/ _ \| ' \ | / // -_)| || |
+    \___||_||_.__/\___||_|    |_|  |_|\___/|_||_||_\_\\___| \_, |
+                                                            |__/ 
+    ---- By: MARH ------------------------------------------
     """
     print(Fore.CYAN + Style.BRIGHT +  ascii_art)
 
 def print_menu():
-  
-    print("\n==================================")
+    print("==================================")
     print("| 1. CALCULAR CIDR               |")
     print("| 2. WIFI SCANNER                |")
     print("| 3. DESCUBRIR IP ACTIVA         |")
@@ -77,9 +70,9 @@ def switch_options(option):
         2: wifi_scanner_main,
         3: host_discovery_main,
         4: escucha_puertos_main,
-        5: menu,
-        6: wifiCrack,
-        7: sublist3r,
+        5: crack_wifi_pswd_main,
+        6: wifi_atack_main,
+        7: interactive,
         8: DDos_atack,
         9: Pswd_generator,
         10: Spoofing,
@@ -94,7 +87,7 @@ def switch_options(option):
     if func:
         func()
     else:
-        print("Opción no válida.")
+        print(Fore.BLACK + Back.RED + "Opción no válida.")
 
 def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")

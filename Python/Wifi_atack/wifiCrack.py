@@ -39,10 +39,11 @@ signal.signal(signal.SIGINT, ctrl_c)
 # Script Banner
 def script_banner():
     owner = r"""
-            __      _____ ___ ___   /\/|   ___ ___    _   ___ 
-     \ \    / /_ _| __|_ _| |/\/   / __| _ \  /_\ / __| |/ /       
-      \ \/\/ / | || _| | |        | (__|   / / _ \ (__| ' <   
-       \_/\_/ |___|_| |___|        \___|_|_\/_/ \_\___|_|\_\    
+  __      ___  __ _    ___             _   
+  \ \    / (_)/ _(_)  / __|_ _ __ _ __| |__
+   \ \/\/ /| |  _| | | (__| '_/ _` / _| / /
+    \_/\_/ |_|_| |_|  \___|_| \__,_\__|_\_\
+                                           
                                                              
     """
 
@@ -754,9 +755,8 @@ def check_parms():
         script_banner()
         menu_panel()
 
-def main():
+def wifi_atack_main():
     check_parms()
 
 if __name__ == "__main__":
-    main()
-
+       wifi_atack_main()
