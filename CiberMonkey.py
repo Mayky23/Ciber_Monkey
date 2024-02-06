@@ -6,7 +6,7 @@ from Python.Escucha_ports import escucha_puertos_main
 from Python.Wifi_pswd.WifiBF import crack_wifi_pswd_main
 from Python.Wifi_atack.wifiCrack import wifi_atack_main
 from Python.ListarSubdominios.sublist3r import interactive
-from Python import DDos_atack
+from Python import ddos_attack_main
 from Python import Pswd_generator
 from Python import Spoofing
 from Python import Backdoor
@@ -73,7 +73,7 @@ def switch_options(option):
         5: crack_wifi_pswd_main,
         6: wifi_atack_main,
         7: interactive,
-        8: DDos_atack,
+        8: ddos_attack_main,
         9: Pswd_generator,
         10: Spoofing,
         11: Backdoor,
