@@ -10,9 +10,9 @@ from Python.DDos_atack import ddos_attack_main
 from Python.Pswd_generator import password_generator_main
 from Python.Spoofing import Spoofing_main
 from Python.Backdoor import backdoor_main
-from Python import Encriptar_Desencriptar
-from Python import Data_generator
-from Python import SQL_injection
+from Python.Encriptar_Desencriptar import  encriptar_desencriptar_main
+from Python.Data_generator import data_generator_main
+from Python.SQL_injection import sql_injection_main
 
 from colorama import *
 
@@ -63,7 +63,7 @@ def main():
                 break
             switch_options(option)
         except ValueError:
-            print("Por favor, ingresa un número válido.")
+            print(Fore.BLACK + Back.RED + "Por favor, ingresa un número válido.")
 
 def switch_options(option):
     options_dict = {
@@ -78,9 +78,9 @@ def switch_options(option):
         9: password_generator_main,
         10: Spoofing_main,
         11: backdoor_main,
-        12: Encriptar_Desencriptar,
-        13: Data_generator,
-        14: SQL_injection,
+        12: encriptar_desencriptar_main,
+        13: data_generator_main,
+        14: sql_injection_main,
         # 15: mysql_audit_main,
         99: print("SALIENDO DEL PROGRAMA...")
     }

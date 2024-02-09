@@ -38,7 +38,7 @@ def encriptar_archivo(ruta, clave):
     with open("encriptado_" + os.path.basename(ruta), "wb") as archivo_encriptado:
         archivo_encriptado.write(salt + datos_encriptados)
 
-    print("Archivo encriptado exitosamente.")
+    print(Fore.BLACK + Back.GREEN + "Archivo encriptado exitosamente.")
 
 def desencriptar_archivo(ruta, clave):
     with open(ruta, "rb") as archivo_encriptado:
@@ -63,7 +63,7 @@ def desencriptar_archivo(ruta, clave):
     with open("desencriptado_" + os.path.basename(ruta), "wb") as archivo_desencriptado:
         archivo_desencriptado.write(datos_desencriptados)
 
-    print("Archivo desencriptado exitosamente.")
+    print(Fore.BLACK + Back.GREEN + "Archivo desencriptado exitosamente.")
 
 def encriptar_desencriptar_main():
     opcion = input(Style.RESET_ALL + "¿Desea encriptar (1) o desencriptar (2)?: ")
@@ -79,7 +79,7 @@ def encriptar_desencriptar_main():
         desencriptar_archivo(ruta_archivo, clave)
 
     else:
-        print("Opción no válida.")
+        print(Fore.BLACK + Back.RED + "Opción no válida.")
 
 def mostrar_menu():
     print("************************")
