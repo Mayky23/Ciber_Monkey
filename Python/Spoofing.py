@@ -7,6 +7,7 @@ import sys
 import os
 from time import sleep
 
+from colorama import *
 
 def banner():
     cartel = r"""
@@ -17,12 +18,13 @@ def banner():
       |_|                       |___/ 
                                              
     """
-    print(cartel)
+    print(Fore.CYAN + cartel)
+    print(Fore.CYAN +"**************************************" + Fore.RESET)
 
 def Spoofing_main():
     if len(sys.argv) != 4:
-        print("\nUsage: python " + sys.argv[0] + " <area-code> <phone-number> <login-pin>\n")
-        print("Example: python " + sys.argv[0] + " 34 XXXXXXXXX 1234\n")
+        print("\nUso: python " + sys.argv[0] + " <area-code> <phone-number> <login-pin>\n")
+        print("Ejemplo: python " + sys.argv[0] + " 34 XXXXXXXXX 1234\n")
         sys.exit(0)
 
     def signal_handler(key, frame):
@@ -192,5 +194,4 @@ def Spoofing_main():
 if __name__ == "__main__":
 
     banner()
-    print("**************************************")
     Spoofing_main()

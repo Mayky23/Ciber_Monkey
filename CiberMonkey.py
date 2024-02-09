@@ -6,10 +6,10 @@ from Python.Escucha_ports import escucha_puertos_main
 from Python.Wifi_pswd.WifiBF import crack_wifi_pswd_main
 from Python.Wifi_atack.wifiCrack import wifi_atack_main
 from Python.ListarSubdominios.sublist3r import interactive
-from Python import ddos_attack_main
-from Python import Pswd_generator
-from Python import Spoofing
-from Python import Backdoor
+from Python.DDos_atack import ddos_attack_main
+from Python.Pswd_generator import password_generator_main
+from Python.Spoofing import Spoofing_main
+from Python.Backdoor import backdoor_main
 from Python import Encriptar_Desencriptar
 from Python import Data_generator
 from Python import SQL_injection
@@ -23,8 +23,8 @@ def print_ascii_art():
     / __|(_)| |__  ___  _ _   |  \/  | ___  _ _  | |__ ___  _  _ 
    | (__ | || '_ \/ -_)| '_|  | |\/| |/ _ \| ' \ | / // -_)| || |
     \___||_||_.__/\___||_|    |_|  |_|\___/|_||_||_\_\\___| \_, |
-                                                            |__/ 
-    ---- By: MARH ------------------------------------------
+                                                             _| |
+    ---- By: MARH ------------------------------------------|__/ 
     """
     print(Fore.CYAN + Style.BRIGHT +  ascii_art)
 
@@ -55,7 +55,8 @@ def main():
         try:
             clear_screen()
             print_ascii_art()
-            print_menu()       
+            print_menu()
+
             option = int(input("\nSELECCIONA UNA OPCIÓN: "))
             if option == 99:
                 print("SALIENDO DEL PROGRAMA...")
@@ -74,9 +75,9 @@ def switch_options(option):
         6: wifi_atack_main,
         7: interactive,
         8: ddos_attack_main,
-        9: Pswd_generator,
-        10: Spoofing,
-        11: Backdoor,
+        9: password_generator_main,
+        10: Spoofing_main,
+        11: backdoor_main,
         12: Encriptar_Desencriptar,
         13: Data_generator,
         14: SQL_injection,

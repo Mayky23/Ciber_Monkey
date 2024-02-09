@@ -3,13 +3,15 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import os
 
+from colorama import *
+
 def obtener_ruta_archivo():
     while True:
         ruta = input("Ingrese la ruta del archivo: ")
         if os.path.exists(ruta):
             return ruta
         else:
-            print("La ruta especificada no existe. Inténtelo de nuevo.")
+            print(Fore.BLACK + Back.RED + "La ruta especificada no existe. Inténtelo de nuevo." + Style.RESET_ALL)
 
 def obtener_clave():
     clave = input("Ingrese la clave de encriptación/desencriptación: ")
@@ -64,7 +66,7 @@ def desencriptar_archivo(ruta, clave):
     print("Archivo desencriptado exitosamente.")
 
 def encriptar_desencriptar_main():
-    opcion = input("¿Desea encriptar (escriba 1) o desencriptar (escriba 2)?: ")
+    opcion = input(Style.RESET_ALL + "¿Desea encriptar (1) o desencriptar (2)?: ")
 
     if opcion == "1":
         ruta_archivo = obtener_ruta_archivo()
@@ -95,8 +97,8 @@ def banner():
   | _|| | / -_) | (_ | || / _` | '_/ _` | / _` | ' \ 
   |_| |_|_\___|  \___|\_,_\__,_|_| \__,_|_\__,_|_||_|
     """
-    print(cartel)
-    mostrar_menu()  # Llama a la función mostrar_menu() aquí
+    print(Fore.WHITE + cartel)
+    mostrar_menu()
 
 if __name__ == "__main__":
     banner()

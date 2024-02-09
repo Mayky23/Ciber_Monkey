@@ -1,4 +1,8 @@
 import random
+import os
+
+from colorama import *
+
 
 ALPHABET = [
     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
@@ -110,9 +114,12 @@ def banner():
  |___/\__,_|\__\__,_|  \___\___|_||_\___|_| \__,_|\__\___/_|  
                                                               
     """
-    print(cartel)
+    print(Fore.BLACK+ Back.WHITE + cartel)
+    print("**************************************************************" + Style.RESET_ALL)
+
+def clear_screen():
+    os.system("cls" if os.name == "nt" else "clear")
 
 if __name__ == "__main__":
     banner()
-    print("**************************************************************")
     data_generator_main()

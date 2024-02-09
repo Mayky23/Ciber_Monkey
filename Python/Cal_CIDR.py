@@ -32,13 +32,13 @@ def banner():
     """
     clear_screen()
     print(Fore.BLUE + cartel)
+    print(Fore.BLUE + "************************************************")
 
 def calculate_cidr():
     while True:
         clear_screen()  # Limpiar la pantalla antes de solicitar la dirección IP
         banner()
-        print("************************************************")
-        ip_string = input(Style.RESET_ALL +"\nIngrese una dirección IP (o 'n' para terminar): ")
+        ip_string = input(Style.RESET_ALL + "\nIngrese una dirección IP (o 'n' para terminar): ")
 
         if ip_string.lower() == "n":
             break
@@ -47,10 +47,10 @@ def calculate_cidr():
             ip = ipaddress.IPv4Address(ip_string)
             prefix_length = get_prefix_length(ip)
             print(f"{ip}/{prefix_length}")
-            input(Style.RESET_ALL +"Presione Enter para continuar...")
+            input(Style.RESET_ALL + "Presione Enter para continuar...")
         except ValueError:
             print(Fore.BLACK + Back.RED + "Dirección IP inválida. Inténtelo de nuevo.")
-            input(Style.RESET_ALL +"Presione Enter para continuar...")
+            input(Style.RESET_ALL + "Presione Enter para continuar...")
             continue  # Volver a solicitar una dirección IP válida
 
 def clear_screen():

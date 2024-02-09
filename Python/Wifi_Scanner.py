@@ -142,10 +142,10 @@ def wifi_scanner_main():
             else:
                 print(Fore.BLACK + Back.RED +"No se encontraron puertos abiertos en esta red.")
 
-            print(Style.RESET_ALL +"----------------------------------------------")
+            print(Style.RESET_ALL + "----------------------------------------------")
 
     else:
-        print(Fore.BLACK + Back.RED +"Opción no válida.")
+        print(Fore.BLACK + Back.RED + "Opción no válida.")
 
 def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")
