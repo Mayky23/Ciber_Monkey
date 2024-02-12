@@ -35,7 +35,10 @@ def obtener_tipo_cifrado(cipher):
 def escanear_red_lan(subnet):
     """Función para escanear hosts en la red LAN."""
 
-    arp_request = scapy.ARP(pdst=subnet)
+    subnet_parts = subnet.split('/')
+    ip = subnet_parts[0]  # Extraer solo la parte de la dirección IP
+
+    arp_request = scapy.ARP(pdst=ip)
     broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
     arp_request_broadcast = broadcast / arp_request
     answered_list = scapy.srp(arp_request_broadcast, timeout=1, verbose=False)[0]
@@ -93,7 +96,7 @@ def wifi_scanner_main():
     opcion = input(Style.RESET_ALL + "\nSeleccione el tipo de conexión (1/2): ").strip()
 
     if opcion == "1":
-        subnet = input("Ingrese la subred de su LAN (por ejemplo, 192.168.1.11/24): ").strip()
+        subnet = input("Ingrese la subred de su LAN (por ejemplo, 192.168.1.1/24): ").strip()
         hosts = escanear_red_lan(subnet)
 
         if not hosts:
