@@ -67,17 +67,13 @@ def parse_arguments():
     parser.add_argument('-v', '--version', action='store_true', help='Display version information')
     return parser.parse_args()
 
-def display_version_info():
-    print("\n\n", CYAN, "by Brahim Jarrar\n")
-    print(RED, " github", BLUE, " : https://github.com/BrahimJarrar/\n")
-    print(GREEN, " CopyRight 2019\n\n")
-    sys.exit(0)
 
 def clear_screen():
     if platform.system().startswith("Win" or "win"):
         os.system("cls")
     else:
         os.system("clear")
+
 
 def crack_wifi_pswd_main():
     
@@ -88,14 +84,12 @@ def crack_wifi_pswd_main():
     print("****************************************************************")
     args = parse_arguments()
 
-    if args.version:
-        display_version_info()
 
     ssid = args.ssid or input("[*] SSID: ")
     wordlist = args.wordlist or input("[*] Passwords file: ")
 
     if not os.path.exists(wordlist):
-        print(RED, "[-] No such file:", BLUE, wordlist)
+        print(RED, "[-] Archivo no encontrado:", BLUE, wordlist)
         sys.exit(1)
 
     print(BLUE, "[~] Cracking...")

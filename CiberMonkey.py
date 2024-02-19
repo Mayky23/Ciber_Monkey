@@ -4,12 +4,9 @@ from Python.Wifi_Scanner import wifi_scanner_main
 from Python.Dev_IP_act import host_discovery_main
 from Python.Escucha_ports import escucha_puertos_main
 from Python.Wifi_pswd.WifiBF import crack_wifi_pswd_main
-from Python.Wifi_atack.wifiCrack import wifi_atack_main
 from Python.ListarSubdominios.sublist3r import interactive
 from Python.DDos_atack import ddos_attack_main
 from Python.Pswd_generator import password_generator_main
-from Python.Spoofing import Spoofing_main
-from Python.Backdoor import backdoor_main
 from Python.Encriptar_Desencriptar import  encriptar_desencriptar_main
 from Python.Data_generator import data_generator_main
 from Python.SQL_injection import sql_injection_main
@@ -53,16 +50,13 @@ def print_menu():
     print("| 3. DESCUBRIR IP ACTIVA         |")
     print("| 4. ESCUCHA DE PUERTOS          |")
     print("| 5. CRACKEAR PSWD WIFI          |")
-    print("| 6. ATACAR WIFI                 |")
-    print("| 7. LISTAR SUBDOMINIOS          |")
-    print("| 8. ATAQUE DDoS                 |")
-    print("| 9. CREAR CONTRASEÑA            |")
-    print("| 10. SPOOFING                   |")
-    print("| 11. BACKDOOR                   |")
-    print("| 12. EN / DESENCRIPTAR ARCHIVO  |")
-    print("| 13. GENERAR DATOS              |")
-    print("| 14. INYECCIÓN SQL              |")
-    print("| 15. AUDITAR BD SQL (disabled)  |")
+    print("| 6. LISTAR SUBDOMINIOS          |")
+    print("| 7. ATAQUE DDoS                 |")
+    print("| 8. CREAR CONTRASEÑA            |")
+    print("| 9. EN / DESENCRIPTAR ARCHIVO   |")
+    print("| 10. GENERAR DATOS              |")
+    print("| 11. INYECCIÓN SQL              |")
+    print("| 12. AUDITAR BD SQL (disabled)  |")
     print("|--------------------------------|")
     print("| 99. SALIR DEL PROGRAMA         |")
     print("|================================|")
@@ -74,6 +68,9 @@ def salir():
         / __| /_\ | |  |_ _| __| \| |   \ / _ \          
         \__ \/ _ \| |__ | || _|| .  | |) | (_) |   _   _ 
         |___/_/ \_\____|___|___|_|\_|___/ \___(_) (_) (_)
+
+        * Linkedin: https://www.linkedin.com/in/mardh   
+        * GitHub: https://github.com/Mayky23 
                                                   
     """
     print(ascii_art)
@@ -85,15 +82,13 @@ def switch_options(option):
         3: host_discovery_main,
         4: escucha_puertos_main,
         5: crack_wifi_pswd_main,
-        6: wifi_atack_main,
-        7: interactive,
-        8: ddos_attack_main,
-        9: password_generator_main,
-        10: Spoofing_main,
-        11: backdoor_main,
-        12: encriptar_desencriptar_main,
-        13: data_generator_main,
-        14: sql_injection_main,
+        6: interactive,
+        7: ddos_attack_main,
+        8: password_generator_main,
+        9: encriptar_desencriptar_main,
+        10: data_generator_main,
+        11: sql_injection_main,
+    #   12: sql_injection_main,
         99: salir
     }
     func = options_dict.get(option)

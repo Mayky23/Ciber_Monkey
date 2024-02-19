@@ -1,9 +1,9 @@
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import os
-
-from colorama import *
+from colorama import Fore, Back, Style
 
 def obtener_ruta_archivo():
     while True:
@@ -22,13 +22,7 @@ def encriptar_archivo(ruta, clave):
         datos = archivo.read()
 
     salt = os.urandom(16)
-    kdf = PBKDF2HMAC(
-        algorithm=algorithms.SHA256(),
-        length=32,
-        salt=salt,
-        iterations=100000,
-        backend=default_backend()
-    )
+    kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=100000, backend=default_backend())
     clave_derivada = kdf.derive(clave)
 
     cipher = Cipher(algorithms.AES(clave_derivada), modes.CFB(salt), backend=default_backend())
@@ -38,7 +32,7 @@ def encriptar_archivo(ruta, clave):
     with open("encriptado_" + os.path.basename(ruta), "wb") as archivo_encriptado:
         archivo_encriptado.write(salt + datos_encriptados)
 
-    print(Fore.BLACK + Back.GREEN + "Archivo encriptado exitosamente.")
+    print(Fore.BLACK + Back.GREEN + "Archivo encriptado exitosamente." + Style.RESET_ALL)
 
 def desencriptar_archivo(ruta, clave):
     with open(ruta, "rb") as archivo_encriptado:
@@ -47,13 +41,7 @@ def desencriptar_archivo(ruta, clave):
     salt = datos_encriptados[:16]
     datos_encriptados = datos_encriptados[16:]
 
-    kdf = PBKDF2HMAC(
-        algorithm=algorithms.SHA256(),
-        length=32,
-        salt=salt,
-        iterations=100000,
-        backend=default_backend()
-    )
+    kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=100000, backend=default_backend())
     clave_derivada = kdf.derive(clave)
 
     cipher = Cipher(algorithms.AES(clave_derivada), modes.CFB(salt), backend=default_backend())
@@ -63,7 +51,7 @@ def desencriptar_archivo(ruta, clave):
     with open("desencriptado_" + os.path.basename(ruta), "wb") as archivo_desencriptado:
         archivo_desencriptado.write(datos_desencriptados)
 
-    print(Fore.BLACK + Back.GREEN + "Archivo desencriptado exitosamente.")
+    print(Fore.BLACK + Back.GREEN + "Archivo desencriptado exitosamente." + Style.RESET_ALL)
 
 def encriptar_desencriptar_main():
     opcion = input(Style.RESET_ALL + "¿Desea encriptar (1) o desencriptar (2)?: ")
@@ -79,14 +67,14 @@ def encriptar_desencriptar_main():
         desencriptar_archivo(ruta_archivo, clave)
 
     else:
-        print(Fore.BLACK + Back.RED + "Opción no válida.")
+        print(Fore.BLACK + Back.RED + "Opción no válida." + Style.RESET_ALL)
 
 def mostrar_menu():
+    banner()
     print("************************")
     print("*         FILE         *")
     print("************************")
     print("*    1. Encriptar      *")
-    print("*                      *")
     print("*    2. Desencriptar   *")
     print("************************")
 
@@ -98,8 +86,11 @@ def banner():
   |_| |_|_\___|  \___|\_,_\__,_|_| \__,_|_\__,_|_||_|
     """
     print(Fore.WHITE + cartel)
-    mostrar_menu()
+
+def clear_screen():
+    os.system("cls" if os.name == "nt" else "clear")
 
 if __name__ == "__main__":
-    banner()
+    clear_screen()
+    mostrar_menu()
     encriptar_desencriptar_main()

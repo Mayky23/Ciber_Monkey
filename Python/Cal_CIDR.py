@@ -1,6 +1,6 @@
 import os
 import ipaddress
-from colorama import *
+from colorama import Fore, Back, Style
 
 def banner():
     cartel = r"""
@@ -18,15 +18,14 @@ def calculate_cidr():
     while True:
         clear_screen()  
         banner()
-        ip_string = input(Style.RESET_ALL + "\nIngrese una dirección IP (o 'n' para terminar): ")
+        ip_string = input(Style.RESET_ALL + "\nIngrese una dirección IP ('n' para terminar): ")
 
         if ip_string.lower() == "n":
             break
 
         try:
-            ip = ipaddress.ip_address(ip_string)
-            prefix_length = get_prefix_length(ip)
-            print(f"{ip}/{prefix_length}")
+            ip_network = ipaddress.ip_network(ip_string, strict=False)
+            print(f"{ip_network}")
             input(Style.RESET_ALL + "Presione Enter para continuar...")
         except ValueError:
             print(Fore.BLACK + Back.RED + "Dirección IP inválida. Inténtelo de nuevo.")

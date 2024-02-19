@@ -68,8 +68,11 @@ def no_color():
     global G, Y, B, R, W
     G = Y = B = R = W = ''
 
+def clear_screen():
+    os.system("cls" if os.name == "nt" else "clear")
 
 def banner():
+    clear_screen()
     print("""%s
                  ____        _     _ _     _   _____
                 / ___| _   _| |__ | (_)___| |_|___ / _ __

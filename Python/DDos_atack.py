@@ -140,12 +140,11 @@ def ddos_attack_main():
                 continue  # Vuelve a solicitar el número de hilos si no es válido
 
     elif respuesta.lower() == "n":
-        print("No se realizará un ataque DDoS.")
-
-    try:
-        input("Presiona Enter para salir...")
-    except KeyboardInterrupt:
-        print(Fore.BLACK + Back.RED + "\nAtaque DDoS interrumpido.")
+        
+        try:
+            input("Presiona Enter para salir...")
+        except KeyboardInterrupt:
+            print(Fore.BLACK + Back.RED + "\nAtaque DDoS interrumpido.")
 
 
 
