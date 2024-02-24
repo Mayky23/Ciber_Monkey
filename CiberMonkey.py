@@ -4,7 +4,7 @@ from Python.Wifi_Scanner import wifi_scanner_main
 from Python.Dev_IP_act import host_discovery_main
 from Python.Escucha_ports import escucha_puertos_main
 from Python.Wifi_pswd.WifiBF import crack_wifi_pswd_main
-from Python.List_Subdominios import List_Subdominios_main
+from Python.ListSubdominios import List_Subdominios_main
 from Python.DDos_atack import ddos_attack_main
 from Python.Pswd_generator import password_generator_main
 from Python.Encriptar_Desencriptar import  encriptar_desencriptar_main
