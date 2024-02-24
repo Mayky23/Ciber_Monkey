@@ -4,7 +4,7 @@ from Python.Wifi_Scanner import wifi_scanner_main
 from Python.Dev_IP_act import host_discovery_main
 from Python.Escucha_ports import escucha_puertos_main
 from Python.Wifi_pswd.WifiBF import crack_wifi_pswd_main
-from Python.ListarSubdominios.sublist3r import interactive
+from Python.List_Subdominios import List_Subdominios_main
 from Python.DDos_atack import ddos_attack_main
 from Python.Pswd_generator import password_generator_main
 from Python.Encriptar_Desencriptar import  encriptar_desencriptar_main
@@ -82,7 +82,7 @@ def switch_options(option):
         3: host_discovery_main,
         4: escucha_puertos_main,
         5: crack_wifi_pswd_main,
-        6: interactive,
+        6: List_Subdominios_main,
         7: ddos_attack_main,
         8: password_generator_main,
         9: encriptar_desencriptar_main,

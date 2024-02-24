@@ -48,6 +48,8 @@ pip install colorama
 
 pip install GitPython
 
+pip install sublist3r
+
 ### Instalar Git:
 ```bash
   sudo apt install git -y
