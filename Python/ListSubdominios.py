@@ -47,3 +47,4 @@ if __name__ == "__main__":
     print("Subdominios encontrados:")
     for subdominio in subdominios:
         print(subdominio)
+
