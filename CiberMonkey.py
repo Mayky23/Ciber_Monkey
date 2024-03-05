@@ -3,7 +3,6 @@ from Python.Cal_CIDR import calculate_cidr
 from Python.Wifi_Scanner import wifi_scanner_main
 from Python.Dev_IP_act import host_discovery_main
 from Python.Escucha_ports import escucha_puertos_main
-from Python.Wifi_pswd.WifiBF import crack_wifi_pswd_main
 from Python.ListSubdominios import List_Subdominios_main
 from Python.DDos_atack import ddos_attack_main
 from Python.Pswd_generator import password_generator_main
@@ -49,14 +48,13 @@ def print_menu():
     print("| 2. WIFI SCANNER                |")
     print("| 3. DESCUBRIR IP ACTIVA         |")
     print("| 4. ESCUCHA DE PUERTOS          |")
-    print("| 5. CRACKEAR PSWD WIFI          |")
-    print("| 6. LISTAR SUBDOMINIOS          |")
-    print("| 7. ATAQUE DDoS                 |")
-    print("| 8. CREAR CONTRASEÑA            |")
-    print("| 9. EN / DESENCRIPTAR ARCHIVO   |")
-    print("| 10. GENERAR DATOS              |")
-    print("| 11. INYECCIÓN SQL              |")
-    print("| 12. AUDITAR BD SQL (disabled)  |")
+    print("| 5. LISTAR SUBDOMINIOS          |")
+    print("| 6. ATAQUE DDoS                 |")
+    print("| 7. CREAR CONTRASEÑA            |")
+    print("| 8. EN / DESENCRIPTAR ARCHIVO   |")
+    print("| 9. GENERAR DATOS               |")
+    print("| 10. INYECCIÓN SQL              |")
+    print("| 11. AUDITAR BD SQL (disabled)  |")
     print("|--------------------------------|")
     print("| 99. SALIR DEL PROGRAMA         |")
     print("|================================|")
@@ -81,14 +79,13 @@ def switch_options(option):
         2: wifi_scanner_main,
         3: host_discovery_main,
         4: escucha_puertos_main,
-        5: crack_wifi_pswd_main,
-        6: List_Subdominios_main,
-        7: ddos_attack_main,
-        8: password_generator_main,
-        9: encriptar_desencriptar_main,
-        10: data_generator_main,
-        11: sql_injection_main,
-    #   12: sql_injection_main,
+        5: List_Subdominios_main,
+        6: ddos_attack_main,
+        7: password_generator_main,
+        8: encriptar_desencriptar_main,
+        9: data_generator_main,
+        10: sql_injection_main,
+    #   11: sql_injection_main,
         99: salir
     }
     func = options_dict.get(option)
