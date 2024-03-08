@@ -68,7 +68,7 @@ def sql_injection_main():
             print(Fore.BLACK + Back.RED + "Error:", e + Style.RESET_ALL)
             continue
         else:
-            break  # Salir del bucle while si no hay excepciones
+            break  
 
 def banner():
     cartel = r"""

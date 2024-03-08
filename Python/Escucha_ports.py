@@ -9,11 +9,15 @@ def escucha_puertos(puerto, direccion_ip):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind((direccion_ip, puerto))
         server_socket.listen(1)
-
+        print("-----------------------------------------------------------")
         print(Style.RESET_ALL + f"Esperando conexiones entrantes en {direccion_ip}:{puerto}...")
 
         client_socket, addr = server_socket.accept()
         print(Style.RESET_ALL + f"Conexión establecida desde: {addr[0]}:{addr[1]}")
+
+        # Obtener información de la conexión entrante
+        peer_ip, peer_port = client_socket.getpeername()
+        print(Style.RESET_ALL + f"Conexión entrante desde: {peer_ip}:{peer_port}")
 
         isocket = client_socket.makefile("r")
         osocket = client_socket.makefile("w")
@@ -38,7 +42,7 @@ def escucha_puertos(puerto, direccion_ip):
         print(f"Ocurrió un error: {e}")
         input(Style.RESET_ALL + "Presione Enter para continuar...")
         clear_screen()
-        
+
 
 def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")

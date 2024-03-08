@@ -125,7 +125,7 @@ def wifi_scanner_main():
                 for puerto in puertos_abiertos:
                     print(f"    Puerto: {puerto}")
             else:
-                print(Fore.BLACK + Back.RED +"No se encontraron puertos abiertos en esta red.")
+                print(Fore.BLACK + Back.RED +"No se encontraron puertos abiertos en esta red." + Style.RESET_ALL )
             print(Style.RESET_ALL + "----------------------------------------------")
 
     else:
