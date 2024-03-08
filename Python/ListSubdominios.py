@@ -1,4 +1,4 @@
-import os  
+import os
 from colorama import Fore, Style
 import sublist3r
 
@@ -12,38 +12,102 @@ def banner():
      ___                 _           ___      _          _   _         
     |   \ ___ _ __  __ _(_)_ _  ___ |   \ ___| |_ ___ __| |_(_)_ _____ 
     | |) / _ \ '  \/ _` | | ' \(_-< | |) / -_)  _/ -_) _|  _| \ V / -_)
-    |___/\___/_|_|_\__,_|_|_||_/__/ |___/\___|\__\___\__|\__|_|\_/\___|                                                          
+    |___/\___/_|_|_\__,_|_|_||_/__/ |___/\___|\__\___\__|\__|_|\_/\___|  
     """
     clear_screen()
-    print(Fore.LIGHTGREEN_EX + "***********************************************************************"  + Style.RESET_ALL)
-    print(cartel)
+    print(Fore.LIGHTGREEN_EX + cartel)
+    print(Fore.LIGHTGREEN_EX + "***********************************************************************" + Style.RESET_ALL)
+    print("Escriba 'n' en cualquier momento para cancelar.\n")
 
-# Función para obtener el dominio desde la entrada del usuario
+# Función para obtener el dominio del usuario con validación de entrada
 def get_domain_from_user():
-    clear_screen()
-    banner()
-    return input("Por favor, introduce el nombre de dominio (sin http/https): ").strip()  # Eliminar espacios alrededor
+    while True:
+        dominio = input("Por favor, introduce el nombre de dominio (sin http/https): ").strip()
+        if not dominio:
+            print("Error: El dominio no puede estar vacío. Inténtalo de nuevo.")
+        elif dominio.lower() == 'n':
+            return None
+        else:
+            return dominio
 
-# Opciones
-no_threads = 40
-savefile = "subdominios.txt"
-ports = None
-silent = False
-verbose = False
-enable_bruteforce = False
-engines = None
+# Función para obtener la ruta del archivo de resultados del usuario con validación de entrada
+def get_savefile_path_from_user():
+    while True:
+        ruta_archivo = input("Ingresa la ruta donde se guardará el archivo de resultados (el valor predeterminado es 'subdominios.txt'): ").strip()
+        if not ruta_archivo:
+            print("Error: La ruta no puede estar vacía. Inténtalo de nuevo.")
+        elif ruta_archivo.lower() == 'n':
+            return None
+        elif not os.path.isdir(os.path.dirname(ruta_archivo)):
+            print("Error: La carpeta especificada no existe. Inténtalo de nuevo.")
+        else:
+            return ruta_archivo
 
-if __name__ == "__main__":
-    clear_screen()
-    banner()
+# Función para establecer opciones de enumeración de subdominios
+def set_options():
+    global no_threads, savefile, ports, silent, verbose, enable_bruteforce, engines
     
+    # Preguntar por el número de hilos
+    no_threads = int(input("Ingresa el número de hilos (el valor predeterminado es 40): ") or "40")
+
+    # Preguntar por la ruta del archivo de guardado
+    savefile = get_savefile_path_from_user()
+    if savefile is None:
+        return False
+
+    # Preguntar por las opciones de escaneo de puertos
+    ports_input = input("¿Quieres especificar los puertos a escanear? (s/n): ").lower()
+    if ports_input == 's':
+        ports = input("Ingresa los puertos a escanear (separados por comas): ").split(',')
+    else:
+        ports = None
+
+    # Preguntar por el modo silencioso
+    silent_input = input("¿Quieres ejecutar en modo silencioso? (s/n): ").lower()
+    silent = silent_input == 's'
+
+    # Preguntar por el modo detallado
+    verbose_input = input("¿Quieres ejecutar en modo detallado? (s/n): ").lower()
+    verbose = verbose_input == 's'
+
+    # Preguntar por la opción de fuerza bruta
+    brute_force_input = input("¿Quieres habilitar la fuerza bruta? (s/n): ").lower()
+    enable_bruteforce = brute_force_input == 's'
+
+    # Preguntar por los motores de búsqueda personalizados
+    engines_input = input("¿Quieres usar motores de búsqueda personalizados? (s/n): ").lower()
+    if engines_input == 's':
+        engines = input("Ingresa los motores de búsqueda personalizados (separados por comas): ").split(',')
+    else:
+        engines = None
+
+    return True
+
+# Función principal para la enumeración de subdominios
+def List_Subdominios_main():
+    clear_screen()
+    banner()
+
     # Obtener el dominio del usuario
     dominio = get_domain_from_user()
+    if dominio is None:
+        print("Cerrando...")
+        return False
 
-    # Buscar subdominios
+    # Establecer opciones para la enumeración de subdominios
+    if not set_options():
+        return False
+
+    # Encontrar subdominios
     subdominios = sublist3r.main(dominio, no_threads, savefile, ports, silent, verbose, enable_bruteforce, engines)
 
     # Imprimir subdominios
     print("Subdominios encontrados:")
     for subdominio in subdominios:
         print(subdominio)
+
+    return True
+
+if __name__ == "__main__":
+    while List_Subdominios_main():
+        pass
