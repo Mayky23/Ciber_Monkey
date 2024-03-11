@@ -10,46 +10,6 @@ Actualizar/Instalar librerías con apt:
 ```bash
   sudo apt update && sudo apt upgrade -y
 ```
-
-### Instalar librerías de Python con pip:
-```bash
-  pip install requests pywifi comtypes python-nmap pytz anytree cryptography dnspython ipy netifaces scapy libpcap pypcap pymysql colorama GitPython
-```
-
-pip install requests    
-
- pip install pywifi          
- 
- pip install comtypes        
- 
- pip install python-nmap   
- 
- pip install pytz            
- 
- pip install anytree
-
- pip install cryptography
-
- pip install dnspython
-
-pip install ipy
-
-pip install netifaces
-
-pip install scapy
-
-pip install libpcap
-
-pip install pypcap
-
-pip install pymysql
-
-pip install colorama
-
-pip install GitPython
-
-pip install sublist3r
-
 ### Instalar Git:
 ```bash
   sudo apt install git -y
@@ -60,6 +20,22 @@ pip install sublist3r
   git clone git://github.com/Mayky23/Ciber_Monkey.git
 ```
 
+### Entar al proyecto:
+
+```bash
+  cd Ciber_Monkey
+```
+### Instalar librerías de Python con pip una vez dentro del directorio de tu proyecto:
+
+```bash
+  pip install -r requirements.txt
+```
+
+#### En caso de error...
+```bash
+  pip requests pywifi comtypes python-nmap pytz anytree cryptography dnspython ipy netifaces scapy libpcap pypcap pymysql colorama GitPython sublist3r pyfiglet
+```
+
 ### Ejecutar Ciber Monkey:
 ```bash
   python3 CiberMonkey.py
@@ -67,13 +43,12 @@ pip install sublist3r
 
 ### Comando único:
 ```bash
-  sudo apt update && sudo apt install git -y && git clone git://github.com/Mayky23/Ciber_Monkey.git && python3 CiberMonkey.py
+  sudo apt update && sudo apt upgrade -y && sudo apt install git -y && git clone git://github.com/Mayky23/Ciber_Monkey.git && cd Ciber_Monkey && pip install -r requirements.txt && python3 CiberMonkey.py
+
 ```
 
-
-![Texto alternativo](URL_de_la_imagen)
-
-![Texto alternativo](URL_de_la_imagen)
+## Imágenes : 📸
+![Imágen del menu principal](img/portada.png)
 
 
 ## Authors : 
