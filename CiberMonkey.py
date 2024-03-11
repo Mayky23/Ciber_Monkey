@@ -1,4 +1,10 @@
 import os
+import subprocess
+import sys
+import time
+from colorama import *
+
+# Importar los módulos
 from Python.Cal_CIDR import calculate_cidr
 from Python.Wifi_Scanner import wifi_scanner_main
 from Python.Dev_IP_act import host_discovery_main
@@ -6,12 +12,10 @@ from Python.Escucha_ports import escucha_puertos_main
 from Python.ListSubdominios import List_Subdominios_main
 from Python.DDos_atack import ddos_attack_main
 from Python.Pswd_generator import password_generator_main
-from Python.Encriptar_Desencriptar import  encriptar_desencriptar_main
+from Python.Encriptar_Desencriptar import encriptar_desencriptar_main
 from Python.Data_generator import data_generator_main
 from Python.SQL_injection import sql_injection_main
 
-import re
-from colorama import *
 
 def print_ascii_art():
     ascii_art = r"""
@@ -41,6 +45,7 @@ def print_ascii_art():
     for line, color in zip(lines, colors * (len(lines) // len(colors) + 1)):
         #  Imprimir la línea con el color y estilo BRIGHT
         print(color + Style.BRIGHT + line)
+
 
 def print_menu():
     print(Fore.BLUE + "|================================|")
@@ -73,6 +78,7 @@ def salir():
     """
     print(ascii_art)
 
+
 def switch_options(option):
     options_dict = {
         1: calculate_cidr,
@@ -85,7 +91,7 @@ def switch_options(option):
         8: encriptar_desencriptar_main,
         9: data_generator_main,
         10: sql_injection_main,
-    #   11: sql_injection_main,
+        #   11: sql_injection_main,
         99: salir
     }
     func = options_dict.get(option)
@@ -94,25 +100,72 @@ def switch_options(option):
     else:
         print(Fore.BLACK + Back.RED + "Opción no válida." + Style.RESET_ALL)
 
+
+def install_dependencies(dependencies):
+    installed_packages = subprocess.check_output(['pip', 'freeze']).decode('utf-8').split('\n')
+    required_packages = [dependency.split('==')[0] for dependency in dependencies]
+
+    print("Verificando dependencias...")
+    missing_dependencies = []
+
+    for dependency in required_packages:
+        if dependency not in installed_packages:
+            missing_dependencies.append(dependency)
+
+    if not missing_dependencies:
+        print(Fore.GREEN + "Todas las dependencias ya están instaladas.")
+    else:
+        print(Fore.YELLOW + "Las siguientes dependencias faltan por instalar:")
+        for dependency in missing_dependencies:
+            print(dependency)
+
+        print(Fore.RESET + "Instalando dependencias...")
+
+        total_dependencies = len(missing_dependencies)
+        progress_unit = 100 / total_dependencies
+        progress = 0
+
+        for index, dependency in enumerate(missing_dependencies, start=1):
+            try:
+                subprocess.check_output(['pip', 'install', dependency])
+            except subprocess.CalledProcessError:
+                print(Fore.RED + f"No se pudo instalar la dependencia: {dependency}")
+
+            # Simular progreso
+            time.sleep(0.5)
+
+            # Actualizar la barra de progreso
+            progress += progress_unit
+            sys.stdout.write("\r")
+            bar_length = 50
+            percent_position = (bar_length - len(str(int(progress)))) // 2
+            bar = "[" + '=' * int(progress / 2) + ' ' * (bar_length - int(progress / 2)) + "]"
+            bar = bar[:percent_position] + str(int(progress)) + '%' + bar[percent_position + len(str(int(progress))):]
+            sys.stdout.write(bar)
+            sys.stdout.flush()
+
+        print(Fore.RESET + Back.GREEN + "\nTodas las dependencias se han instalado correctamente." + Style.RESET_ALL)
+
+    return True
+
 def main():
-    while True:    
-        try:
-            clear_screen()
-            print_ascii_art()
-            print_menu()
+    dependencies = ["colorama"]
+    if install_dependencies(dependencies):
+        while True:
+            try:
+                os.system('cls' if os.name == 'nt' else 'clear')
+                print_ascii_art()
+                print_menu()
 
-            option = int(input("\nSELECCIONA UNA OPCIÓN: " + Fore.RESET))
-            if option == 99:
-                salir()
-                break
-            switch_options(option)
-        except ValueError:
-            print(Fore.BLACK + Back.RED + "Por favor, ingresa un número válido." + Style.RESET_ALL)
-            continue
+                option = int(input("\nSELECCIONA UNA OPCIÓN: " + Fore.RESET))
+                if option == 99:
+                    salir()
+                    break
+                switch_options(option)
+            except ValueError:
+                print(Fore.BLACK + Back.RED + "Por favor, ingresa un número válido." + Style.RESET_ALL)
+                continue
 
-
-def clear_screen():
-    os.system("cls" if os.name == "nt" else "clear")
 
 if __name__ == "__main__":
     main()
