@@ -18,6 +18,7 @@ from Python.SQL_injection import sql_injection_main
 
 
 def print_ascii_art():
+    clear_screen()
     ascii_art = r"""
      ___  _  _                 __  __             _              
     / __|(_)| |__  ___  _ _   |  \/  | ___  _ _  | |__ ___  _  _ 
@@ -100,8 +101,11 @@ def switch_options(option):
     else:
         print(Fore.BLACK + Back.RED + "Opción no válida." + Style.RESET_ALL)
 
+def clear_screen():
+    os.system("cls" if os.name == "nt" else "clear")
 
 def install_dependencies(dependencies):
+    clear_screen()
     installed_packages = subprocess.check_output(['pip', 'freeze']).decode('utf-8').split('\n')
     required_packages = [dependency.split('==')[0] for dependency in dependencies]
 
@@ -113,39 +117,41 @@ def install_dependencies(dependencies):
             missing_dependencies.append(dependency)
 
     if not missing_dependencies:
-        print(Fore.GREEN + "Todas las dependencias ya están instaladas.")
+        print(Fore.GREEN + "[-] Todas las dependencias ya están instaladas." + Style.RESET_ALL)
+        time.sleep(1)
     else:
-        print(Fore.YELLOW + "Las siguientes dependencias faltan por instalar:")
+        print(Fore.YELLOW + "Las siguientes dependencias faltan por instalar:" + Style.RESET_ALL)
+        print("_______________________________________________")
+        
         for dependency in missing_dependencies:
-            print(dependency)
-
-        print(Fore.RESET + "Instalando dependencias...")
+            print("\n" ,dependency)
+        time.sleep(1)
 
         total_dependencies = len(missing_dependencies)
         progress_unit = 100 / total_dependencies
         progress = 0
 
         for index, dependency in enumerate(missing_dependencies, start=1):
+            print(Fore.RESET + "Instalando dependencia {} de {}...".format(index, total_dependencies))
             try:
                 subprocess.check_output(['pip', 'install', dependency])
             except subprocess.CalledProcessError:
-                print(Fore.RED + f"No se pudo instalar la dependencia: {dependency}")
+                print(Fore.RED + f"No se pudo instalar la dependencia: {dependency}" + Style.RESET_ALL)
 
             # Simular progreso
-            time.sleep(0.5)
+            time.sleep(1)
 
             # Actualizar la barra de progreso
             progress += progress_unit
-            sys.stdout.write("\r")
             bar_length = 50
-            percent_position = (bar_length - len(str(int(progress)))) // 2
-            bar = "[" + '=' * int(progress / 2) + ' ' * (bar_length - int(progress / 2)) + "]"
-            bar = bar[:percent_position] + str(int(progress)) + '%' + bar[percent_position + len(str(int(progress))):]
-            sys.stdout.write(bar)
-            sys.stdout.flush()
+            bar = "=" * int(progress / (100 / bar_length))
+            spaces = " " * (bar_length - len(bar))
+            percent = "{}%".format(int(progress))
+            print("\rProgreso: [{}] {}".format(bar.ljust(bar_length), percent.rjust(4)), end='', flush=True)
+
+            time.sleep(10)
 
         print(Fore.RESET + Back.GREEN + "\nTodas las dependencias se han instalado correctamente." + Style.RESET_ALL)
-
     return True
 
 def main():
