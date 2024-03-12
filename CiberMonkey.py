@@ -124,7 +124,7 @@ def install_dependencies(dependencies):
         print("_______________________________________________")
         
         for dependency in missing_dependencies:
-            print("\n" ,dependency)
+            print("\n -" ,dependency)
         time.sleep(1)
 
         total_dependencies = len(missing_dependencies)
@@ -132,7 +132,7 @@ def install_dependencies(dependencies):
         progress = 0
 
         for index, dependency in enumerate(missing_dependencies, start=1):
-            print(Fore.RESET + "Instalando dependencia {} de {}...".format(index, total_dependencies))
+            print(Fore.RESET + "\nInstalando dependencia {} de {}...".format(index, total_dependencies))
             try:
                 subprocess.check_output(['pip', 'install', dependency])
             except subprocess.CalledProcessError:
@@ -143,13 +143,12 @@ def install_dependencies(dependencies):
 
             # Actualizar la barra de progreso
             progress += progress_unit
-            bar_length = 50
+            bar_length = 20
             bar = "=" * int(progress / (100 / bar_length))
             spaces = " " * (bar_length - len(bar))
             percent = "{}%".format(int(progress))
-            print("\rProgreso: [{}] {}".format(bar.ljust(bar_length), percent.rjust(4)), end='', flush=True)
-
-            time.sleep(10)
+            print("\rProgreso: [{}{}] {}".format(bar, spaces, percent.rjust(4)), end='', flush=True)
+            time.sleep(5)
 
         print(Fore.RESET + Back.GREEN + "\nTodas las dependencias se han instalado correctamente." + Style.RESET_ALL)
     return True

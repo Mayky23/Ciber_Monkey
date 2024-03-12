@@ -87,8 +87,8 @@ def banner():
                                        
     """
     clear_screen()
-    print(Fore.LIGHTGREEN_EX + cartel)
-    print("***********************************************************")
+    print(Fore.YELLOW + cartel)
+    print("***********************************************************" + Style.RESET_ALL )
 
 if __name__ == "__main__":
     clear_screen()

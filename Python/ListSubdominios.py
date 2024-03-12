@@ -1,5 +1,5 @@
 import os
-from colorama import Fore, Style
+from colorama import *
 import sublist3r
 
 # Función para limpiar la pantalla
@@ -15,14 +15,14 @@ def banner():
     |___/\___/_|_|_\__,_|_|_||_/__/ |___/\___|\__\___\__|\__|_|\_/\___|  
     """
     clear_screen()
-    print(Fore.LIGHTGREEN_EX + cartel)
-    print(Fore.LIGHTGREEN_EX + "***********************************************************************" + Style.RESET_ALL)
+    print(Fore.MAGENTA + cartel)
+    print(Fore.MAGENTA + "***********************************************************************" + Style.RESET_ALL)
     print("Escriba 'n' en cualquier momento para cancelar.\n")
 
 # Función para obtener el dominio del usuario con validación de entrada
 def get_domain_from_user():
     while True:
-        dominio = input("Por favor, introduce el nombre de dominio (sin http/https): ").strip()
+        dominio = input("Introduce el nombre de dominio (sin http/https): ").strip()
         if not dominio:
             print("Error: El dominio no puede estar vacío. Inténtalo de nuevo.")
         elif dominio.lower() == 'n':
@@ -35,11 +35,11 @@ def get_savefile_path_from_user():
     while True:
         ruta_archivo = input("Ingresa la ruta donde se guardará el archivo de resultados (el valor predeterminado es 'subdominios.txt'): ").strip()
         if not ruta_archivo:
-            print("Error: La ruta no puede estar vacía. Inténtalo de nuevo.")
+            print(Fore.BLACK + Back.RED + "Error: La ruta no puede estar vacía. Inténtalo de nuevo." + Style.RESET_ALL)
         elif ruta_archivo.lower() == 'n':
             return None
         elif not os.path.isdir(os.path.dirname(ruta_archivo)):
-            print("Error: La carpeta especificada no existe. Inténtalo de nuevo.")
+            print(Fore.BLACK + Back.RED + "Error: La carpeta especificada no existe. Inténtalo de nuevo." + Style.RESET_ALL)
         else:
             return ruta_archivo
 
