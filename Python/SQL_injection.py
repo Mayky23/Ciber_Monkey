@@ -16,12 +16,12 @@ def sql_injection_main():
             if target_url.lower() == 'n':
                 sys.exit()  # Salir del programa si el usuario escribe 'n'
             elif not target_url.startswith("http://") and not target_url.startswith("https://"):
-                raise ValueError("La URL debe comenzar con 'http://' o 'https://'")
+                raise ValueError(Fore.BLACK + Back.RED + "La URL debe comenzar con 'http://' o 'https://'" + Style.RESET_ALL)
 
             num_injections = int(input("Ingrese el número de inyecciones de SQL que desea generar: "))
 
             if num_injections <= 0:
-                raise ValueError("El número de inyecciones debe ser un entero positivo.")
+                raise ValueError(Fore.BLACK + Back.RED + "El número de inyecciones debe ser un entero positivo." + Style.RESET_ALL)
 
             # Lista de payloads para inyección SQL
             payloads = [

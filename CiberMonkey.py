@@ -109,7 +109,7 @@ def install_dependencies(dependencies):
     installed_packages = subprocess.check_output(['pip', 'freeze']).decode('utf-8').split('\n')
     required_packages = [dependency.split('==')[0] for dependency in dependencies]
 
-    print("Verificando dependencias...")
+    print("[-] Verificando dependencias...")
     missing_dependencies = []
 
     for dependency in required_packages:
@@ -120,8 +120,8 @@ def install_dependencies(dependencies):
         print(Fore.GREEN + "[-] Todas las dependencias ya están instaladas." + Style.RESET_ALL)
         time.sleep(1)
     else:
-        print(Fore.YELLOW + "Las siguientes dependencias faltan por instalar:" + Style.RESET_ALL)
-        print("_______________________________________________")
+        print(Fore.YELLOW + "\n[!] Las siguientes dependencias faltan por instalar:" + Style.RESET_ALL)
+        print("____________________________________________________")
         
         for dependency in missing_dependencies:
             print("\n -" ,dependency)

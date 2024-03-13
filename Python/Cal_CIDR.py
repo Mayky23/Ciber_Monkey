@@ -14,23 +14,29 @@ def banner():
     print(Fore.BLUE + cartel)
     print(Fore.BLUE + "************************************************")
 
+# Función para calcular el CIDR (Classless Inter-Domain Routing)
 def calculate_cidr():
     while True:
-        clear_screen()  
+        clear_screen() 
         banner()
+
+        # Solicita al usuario la IP
         ip_string = input(Style.RESET_ALL + "\nIngrese una dirección IP ('n' para terminar): ")
 
         if ip_string.lower() == "n":
             break
 
         try:
+            # Intenta crear un objeto de red IP a partir de la cadena proporcionada
             ip_network = ipaddress.ip_network(ip_string, strict=False)
-            print(f"{ip_network}")
+            print(f"{ip_network}")  # Muestra la red IP calculada , f para respetar el formato de ip de red
             input(Style.RESET_ALL + "Presione Enter para continuar...")
         except ValueError:
+            # Si se produce un error de valor, se vuelve a pedir la IP
             print(Fore.BLACK + Back.RED + "Dirección IP inválida. Inténtelo de nuevo.")
             input(Style.RESET_ALL + "Presione Enter para continuar...")
-            continue  
+            continue  # Continúa con la próxima iteración del bucle si hay un error
+
 
 def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")

@@ -6,6 +6,7 @@ from colorama import Fore, Back, Style, init
 # Inicializar colorama
 init()
 
+# Definir listas de datos para la generación de información personal
 ALPHABET = [
     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
     "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
@@ -39,7 +40,7 @@ EMAIL_DOMAINS = [
     "icloud.com", "mail.com", "live.com", "protonmail.com", "example.com"
 ]
 
-
+# Función principal para la generación de datos personales.
 def data_generator_main():
     while True:
         clear_screen()
@@ -61,6 +62,7 @@ def data_generator_main():
                 date_of_birth = generate_date_of_birth()
                 password = generate_password()
                 
+                # Mostrar los datos generados de la persona.
                 print("DNI:", dni)
                 print("Nombre:", name)
                 print("Email:", email)
@@ -72,12 +74,12 @@ def data_generator_main():
         except ValueError:
             print("Error: Ingresa un número válido o escribe 'n' para terminar.")
 
-
+# Función para generar un DNI aleatorio.
 def generate_dni():
     dni = ''.join(str(random.randint(0, 9)) for _ in range(8))
     return f"{dni}{random.choice(ALPHABET)}"
 
-
+# Función para generar un nombre y un email aleatorios.
 def generate_name_and_email():
     first_name = random.choice(FIRST_NAMES)
     last_name = random.choice(LAST_NAMES)
@@ -85,31 +87,32 @@ def generate_name_and_email():
 
     full_name = f"{first_name} {last_name}"
     
-    # Email generation using the first letter of the first name and full last name
+    # Generar un email utilizando la primera letra del nombre y el apellido completo
     email = f"{first_name.lower()[0]}{last_name.lower()}@{domain}"
 
     return full_name, email
 
-
+# Función para generar una cuenta bancaria aleatoria.
 def generate_bank_account():
     bank = random.choice(BANKS)
     account_number = ''.join(str(random.randint(0, 9)) for _ in range(10))
     return f"{bank} - {account_number}"
 
-
+# Función para generar una fecha de nacimiento aleatoria.
 def generate_date_of_birth():
     year = random.randint(1970, 2019)
     month = random.randint(1, 12)
     day = random.randint(1, 28)
     return f"{year:04d}-{month:02d}-{day:02d}"
 
-
+# Función para generar una contraseña aleatoria.
 def generate_password():
     length = 8
     characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()"
     password = ''.join(random.choice(characters) for _ in range(length))
     return password
 
+# Función para mostrar el banner de la aplicación.
 def banner():
     cartel = r"""
   ___       _           ___                       _           
@@ -121,6 +124,7 @@ def banner():
     print(Fore.LIGHTYELLOW_EX + cartel)
     print("**************************************************************" + Style.RESET_ALL)
 
+# Función para limpiar la pantalla de la consola.
 def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")
 

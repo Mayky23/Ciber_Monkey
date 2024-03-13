@@ -1,9 +1,9 @@
 import os
-import pywifi
-from pywifi import const
-import nmap
-import scapy.all as scapy
-from colorama import *
+import pywifi  # Para escanear redes WiFi
+from pywifi import const  # Constantes utilizadas en pywifi
+import nmap  # Para escanear puertos en la red
+import scapy.all as scapy  # Para escanear hosts en la red LAN
+from colorama import *  
 
 # Mapeo de tipos de autenticación para mostrar descripciones más legibles
 TIPOS_AUTENTICACION = {
@@ -31,12 +31,17 @@ def obtener_tipo_cifrado(cipher):
 
 def escanear_red_lan(ip):
     """Función para escanear hosts en la red LAN."""
-    subnet = ip + "/24"  # Agregar /24 para escanear toda la subred
+    # Se define la subred a escanear agregando /24 al final de la IP.
+    subnet = ip + "/24"  
+    # Se crea una solicitud ARP utilizando la biblioteca Scapy.
     arp_request = scapy.ARP(pdst=subnet)
+    # Se crea un paquete de difusión Ethernet para enviar la solicitud ARP a todos los hosts en la red.
     broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
     arp_request_broadcast = broadcast / arp_request
+    # Se envía la solicitud ARP y se obtiene la lista de hosts que respondieron.
     answered_list = scapy.srp(arp_request_broadcast, timeout=1, verbose=False)[0]
     hosts = []
+    # Se recorre la lista de hosts respondidos y se extrae la dirección IP de cada uno.
     for element in answered_list:
         host = {"ip": element[1].psrc}
         hosts.append(host)
@@ -44,9 +49,12 @@ def escanear_red_lan(ip):
 
 def escanear_puertos(ip):
     """Función para escanear puertos abiertos en una dirección IP."""
+    # Se crea un objeto Nmap para escanear puertos utilizando la biblioteca python-nmap.
     nm = nmap.PortScanner()
+    # Se escanean los puertos de la dirección IP especificada utilizando la biblioteca python-nmap.
     nm.scan(hosts=ip, arguments='-p 1-65535 --open')
     puertos_abiertos = []
+    # Se recorre la lista de hosts escaneados y se extraen los puertos abiertos.
     for host in nm.all_hosts():
         if 'tcp' in nm[host]:
             for port in nm[host]['tcp'].keys():
@@ -54,13 +62,27 @@ def escanear_puertos(ip):
     return puertos_abiertos
 
 def escanear_redes_wifi():
-    """Función para escanear redes WiFi disponibles."""
-    wifi = pywifi.PyWiFi()
-    iface = wifi.interfaces()[0]
-    iface.scan()
-    return iface.scan_results()
+    """Función para escanear redes WiFi disponibles utilizando la biblioteca pywifi."""
+    try:
+        # Se inicializa la interfaz de red WiFi utilizando la biblioteca pywifi.
+        wifi = pywifi.PyWiFi()
+        # Se obtiene la primera interfaz de red WiFi disponible.
+        iface = wifi.interfaces()[0]
+        # Se escanean las redes WiFi disponibles.
+        iface.scan()
+        return iface.scan_results()
+    except IndexError:
+        # Manejo de excepción si no se encuentran interfaces de red WiFi disponibles.
+        print(Fore.BLACK + Back.RED +"No se encontraron interfaces de red WiFi disponibles." + Style.RESET_ALL)
+        return []
+    except Exception as e:
+        # Manejo de excepción general en caso de error al escanear redes WiFi.
+        print(Fore.BLACK + Back.RED + f"Error al escanear redes WiFi: {e}" + Style.RESET_ALL)
+        return []
+
 
 def banner():
+    """Función para mostrar un banner en la consola."""
     cartel = r"""
   __      ___  __ _   ___
   \ \    / (_)/ _(_) / __| __ __ _ _ _  _ _  ___ _ _
@@ -91,7 +113,7 @@ def wifi_scanner_main():
         subnet = input("Ingrese la subred de su LAN (por ejemplo, 192.168.1.1/24): ").strip()
         hosts = escanear_red_lan(subnet)
         if not hosts:
-            print(Fore.BLACK + Back.RED +"No se encontraron hosts en la red LAN.")
+            print(Fore.BLACK + Back.RED +"No se encontraron hosts en la red LAN." + Style.RESET_ALL)
             return
         print("Hosts en la red LAN:")
         for host in hosts:
@@ -102,13 +124,13 @@ def wifi_scanner_main():
                 for puerto in puertos_abiertos:
                     print("    Puerto:", puerto)
             else:
-                print(Fore.BLACK + Back.RED +"No se encontraron puertos abiertos en este host.")
+                print(Fore.BLACK + Back.RED +"No se encontraron puertos abiertos en este host." + Style.RESET_ALL)
             print(Style.RESET_ALL +"----------------------------------------------")
 
     elif opcion == "2":
         resultados = escanear_redes_wifi()
         if not resultados:
-            print(Fore.BLACK + Back.RED +"No se encontraron redes WiFi disponibles.")
+            print(Fore.BLACK + Back.RED +"No se encontraron redes WiFi disponibles." + Style.RESET_ALL)
             return
         print(Style.RESET_ALL + "Redes WiFi disponibles:")
         for resultado in resultados:
@@ -134,7 +156,9 @@ def wifi_scanner_main():
         wifi_scanner_main()
 
 def clear_screen():
+    """Función para limpiar la pantalla de la consola."""
     os.system("cls" if os.name == "nt" else "clear")
+
 
 if __name__ == "__main__":
     clear_screen()
