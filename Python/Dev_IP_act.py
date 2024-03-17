@@ -35,7 +35,7 @@ async def listar_ips_activas(direccion_ip):
         direccion_ip_obj = ipaddress.ip_address(direccion_ip)
     except ValueError:
         # Manejo de excepción si la dirección IP proporcionada es inválida.
-        print(Fore.BLACK + Back.RED + "Dirección IP inválida. Inténtelo de nuevo.")
+        print(Fore.BLACK + Back.RED + "Dirección IP inválida. Inténtelo de nuevo." + Style.RESET_ALL)
         return
 
     # Se define la red local utilizando la dirección IP y la máscara de subred /24.

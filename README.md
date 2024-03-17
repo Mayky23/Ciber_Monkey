@@ -4,6 +4,8 @@
 
 ## Ejecutar : 🚀
 
+## Linux
+
 ### Actualizar/Instalar Librerías: 
 
 Actualizar/Instalar librerías con apt:
@@ -45,6 +47,13 @@ Actualizar/Instalar librerías con apt:
 ```bash
   sudo apt update && sudo apt upgrade -y && sudo apt install git -y && git clone git://github.com/Mayky23/Ciber_Monkey.git && cd Ciber_Monkey && pip install -r requirements.txt && python3 CiberMonkey.py
 
+```
+## Windows
+
+Para que la herramienta también funcione en sistemas Windows, asegúrate de tener Python instalado en tu sistema y sigue los mismos pasos para clonar el repositorio y instalar las dependencias utilizando pip. Una vez hecho esto, puedes ejecutar la herramienta utilizando el comando:
+
+```bash
+  python CiberMonkey.py
 ```
 
 ## Imágenes : 📸
