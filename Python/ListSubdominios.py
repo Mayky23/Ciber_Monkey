@@ -35,13 +35,23 @@ def get_savefile_path_from_user():
     while True:
         ruta_archivo = input("Ingresa la ruta donde se guardará el archivo de resultados (el valor predeterminado es 'subdominios.txt'): ").strip()
         if not ruta_archivo:
-            print(Fore.BLACK + Back.RED + "Error: La ruta no puede estar vacía. Inténtalo de nuevo." + Style.RESET_ALL)
-        elif ruta_archivo.lower() == 'n':
-            return None
-        elif not os.path.isdir(os.path.dirname(ruta_archivo)):
-            print(Fore.BLACK + Back.RED + "Error: La carpeta especificada no existe. Inténtalo de nuevo." + Style.RESET_ALL)
-        else:
-            return ruta_archivo
+            ruta_archivo = 'subdominios.txt'  # Valor predeterminado
+
+        # Verificar si el directorio existe o se puede crear
+        directorio = os.path.dirname(ruta_archivo)
+        try:
+            os.makedirs(directorio, exist_ok=True)
+        except OSError as e:
+            print(Fore.BLACK + Back.RED + f"Error: No se pudo crear el directorio. Detalles: {str(e)}" + Style.RESET_ALL)
+            continue
+
+        # Verificar si se tienen permisos para escribir en el directorio
+        if not os.access(directorio, os.W_OK):
+            print(Fore.BLACK + Back.RED + "Error: No tienes permisos para escribir en la carpeta especificada. Inténtalo de nuevo." + Style.RESET_ALL)
+            continue
+
+        return ruta_archivo
+
 
 # Función para establecer opciones de enumeración de subdominios
 def set_options():

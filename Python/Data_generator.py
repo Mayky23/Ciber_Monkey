@@ -1,7 +1,7 @@
-import random
+import msvcrt
 import os
-
-from colorama import Fore, Back, Style, init
+import random
+from colorama import *
 
 # Inicializar colorama
 init()
@@ -43,9 +43,8 @@ EMAIL_DOMAINS = [
 # Función principal para la generación de datos personales.
 def data_generator_main():
     while True:
-        clear_screen()
         banner()
-        response = input("¿Cuántas personas deseas generar? (Escribe 'n' para terminar)\n")
+        response = get_input("¿Cuántas personas deseas generar? (Escribe 'n' para terminar): ")
 
         if response.lower() == "n":
             break
@@ -73,6 +72,24 @@ def data_generator_main():
 
         except ValueError:
             print("Error: Ingresa un número válido o escribe 'n' para terminar.")
+
+# Función para leer una entrada de usuario sin necesidad de presionar Enter
+def get_input(prompt):
+    print(prompt, end='', flush=True)
+    input_str = ''
+    while True:
+        key = msvcrt.getwch()
+        if key == '\r':  # Si se presiona Enter
+            break
+        elif key == '\b':  # Si se presiona la tecla de retroceso
+            if input_str:
+                input_str = input_str[:-1]
+                print('\b \b', end='', flush=True)
+        else:
+            input_str += key
+            print(key, end='', flush=True)
+    print()  # Imprime un salto de línea después de la entrada del usuario
+    return input_str
 
 # Función para generar un DNI aleatorio.
 def generate_dni():
@@ -129,6 +146,5 @@ def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")
 
 if __name__ == "__main__":
-    clear_screen()
     banner()
     data_generator_main()

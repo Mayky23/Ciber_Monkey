@@ -95,6 +95,7 @@ def encriptar_desencriptar_main():
     while True:
         clear_screen()
         banner()
+        mostrar_menu()
         # Solicita al usuario elegir entre encriptar, desencriptar o salir.
         opcion = input(Style.RESET_ALL + "¿Desea encriptar (1) o desencriptar (2)? 'n' para terminar: ")
 

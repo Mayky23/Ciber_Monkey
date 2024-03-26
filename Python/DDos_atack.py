@@ -72,6 +72,7 @@ def start_ddos_attack(ip, port):
             print("Packets Sent: ", sent)
     except KeyboardInterrupt:
         # Mostrar mensaje cuando se detiene el ataque por interrupción del teclado.
+        banner()
         print(Fore.BLACK + Back.RED + "\n[+] Attack Stopped" + Style.RESET_ALL)
 
 # Función para mostrar el banner del programa.
