@@ -136,7 +136,7 @@ def banner():
  |   \ __ _| |_ __ _   / __|___ _ _  ___ _ _ __ _| |_ ___ _ _ 
  | |) / _` |  _/ _` | | (_ / -_) ' \/ -_) '_/ _` |  _/ _ \ '_|
  |___/\__,_|\__\__,_|  \___\___|_||_\___|_| \__,_|\__\___/_|  
-                                                              
+                                                            
     """
     print(Fore.LIGHTYELLOW_EX + cartel)
     print("**************************************************************" + Style.RESET_ALL)
@@ -146,5 +146,4 @@ def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")
 
 if __name__ == "__main__":
-    banner()
     data_generator_main()

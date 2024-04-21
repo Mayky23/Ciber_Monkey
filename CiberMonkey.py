@@ -75,7 +75,6 @@ def salir():
 
         * Linkedin: https://www.linkedin.com/in/mardh   
         * GitHub: https://github.com/Mayky23 
-                                                  
     """
     print(ascii_art)
 

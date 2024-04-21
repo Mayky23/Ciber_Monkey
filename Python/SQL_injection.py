@@ -14,7 +14,7 @@ def sql_injection_main():
         try:
             target_url = input("Ingrese la URL objetivo (o escriba 'n' para salir): ")
             if target_url.lower() == 'n':
-                sys.exit()  # Salir del programa si el usuario escribe 'n'
+                break  # Salir del programa si el usuario escribe 'n'
             elif not target_url.startswith("http://") and not target_url.startswith("https://"):
                 raise ValueError(Fore.BLACK + Back.RED + "La URL debe comenzar con 'http://' o 'https://'" + Style.RESET_ALL)
 
@@ -67,8 +67,10 @@ def sql_injection_main():
             clear_screen()
             print(Fore.BLACK + Back.RED + "Error:", e + Style.RESET_ALL)
             continue
-        else:
-            break  
+    # Mostrar el banner nuevamente al finalizar
+    banner()
+
+
 
 def banner():
     cartel = r"""
