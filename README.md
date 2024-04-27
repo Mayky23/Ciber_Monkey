@@ -35,7 +35,7 @@ Actualizar/Instalar librerías con apt:
 
 #### En caso de error...
 ```bash
-  pip requests pywifi comtypes python-nmap pytz anytree cryptography dnspython ipy netifaces scapy libpcap pypcap pymysql colorama GitPython sublist3r pyfiglet
+  pip requests pywifi comtypes python-nmap pytz anytree cryptography dnspython ipy netifaces scapy libpcap pypcap pymysql colorama GitPython sublist3r pyfiglet exifread
 ```
 
 ### Ejecutar Ciber Monkey:

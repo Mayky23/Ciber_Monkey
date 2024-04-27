@@ -15,3 +15,5 @@ pymysql
 colorama
 GitPython
 sublist3r
+pyfiglet
+exifread
