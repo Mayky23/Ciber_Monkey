@@ -1,98 +1,72 @@
 import secrets
-import os
-from colorama import *
 
-# Definición de conjuntos de caracteres para generar contraseñas.
+from colorama import Back, Fore, Style, init
+from Python.ui import draw_banner, pause
+
+init(autoreset=True)
+COMMON_ASCII = r"""
+ Pwd Generator
+"""
+BANNER_COLOR = "\033[97m"
+
 CARACTERES_MINUSCULAS = "abcdefghijklmnopqrstuvwxyz"
-CARACTERES_MAYUSCULAS = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ"
+CARACTERES_MAYUSCULAS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 NUMEROS = "0123456789"
-CARACTERES_ESPECIALES = "!@#$%^&*()_+-=[]{}|;':\"<>,.?/~`"
+CARACTERES_ESPECIALES = "!@#$%^&*()_+-=[]{}|;:,.?/"
 
-# Función para generar contraseñas aleatorias.
+
 def generar_contrasena(longitud, opciones):
-    caracteres_usados = ""
-
-    # Construir el conjunto de caracteres a partir de las opciones seleccionadas.
+    alphabet = ""
     if "min" in opciones:
-        caracteres_usados += CARACTERES_MINUSCULAS
+        alphabet += CARACTERES_MINUSCULAS
     if "may" in opciones:
-        caracteres_usados += CARACTERES_MAYUSCULAS
+        alphabet += CARACTERES_MAYUSCULAS
     if "num" in opciones:
-        caracteres_usados += NUMEROS
+        alphabet += NUMEROS
     if "espc" in opciones:
-        caracteres_usados += CARACTERES_ESPECIALES
+        alphabet += CARACTERES_ESPECIALES
+    if not alphabet:
+        raise ValueError("Debes seleccionar al menos un grupo de caracteres.")
+    return "".join(secrets.choice(alphabet) for _ in range(longitud))
 
-    # Generar la contraseña aleatoria utilizando los caracteres definidos.
-    contrasena = ''.join(secrets.choice(caracteres_usados) for _ in range(longitud))
-    return contrasena
 
-# Función principal para la generación de contraseñas.
 def password_generator_main():
-    clear_screen()
-    banner()
     while True:
-        # Solicitar al usuario si desea generar una contraseña.
-        opcion = input(Style.RESET_ALL + "¿Desea generar una contraseña? (s/n): ")
+        banner()
+        answer = input("Generar una contrasena? (s/n): ").strip().lower()
+        if answer == "n":
+            return
+        if answer != "s":
+            pause(Fore.RED + "Opcion no valida. Pulsa Enter para continuar...")
+            continue
 
-        if opcion.lower() == "s":
-            while True:
-                try:
-                    # Solicitar la longitud deseada para la contraseña.
-                    longitud = int(input("\nIngrese la longitud de la contraseña: "))
-                    if longitud <= 0:
-                        raise ValueError
-                    break
-                except ValueError:
-                    # Manejar la excepción en caso de que se ingrese una longitud inválida.
-                    print(Fore.BLACK + Back.RED + "Longitud inválida. Por favor, ingrese un número entero positivo.")
-                    print(Style.RESET_ALL + "")
+        try:
+            longitud = int(input("Longitud deseada: ").strip())
+            if longitud <= 0:
+                raise ValueError
+        except ValueError:
+            pause(Fore.BLACK + Back.RED + "Longitud invalida." + Style.RESET_ALL)
+            continue
 
-            while True:
-                # Solicitar las opciones de caracteres deseadas para la contraseña.
-                opciones = input("Ingrese las opciones (min/may/num/espc): ").lower().split('/')
-                if all(opcion in ["min", "may", "num", "espc"] for opcion in opciones):
-                    break
-                else:
-                    # Manejar la excepción en caso de opciones de caracteres inválidas.
-                    print(Fore.BLACK + Back.RED + "Opciones inválidas. Por favor, ingrese opciones válidas.")
-                    print(Style.RESET_ALL + "")
-            
-            # Generar la contraseña utilizando las especificaciones proporcionadas.
-            contrasena = generar_contrasena(longitud, opciones)
+        opciones = input("Grupos a usar (min/may/num/espc): ").strip().lower().split("/")
+        if not all(opcion in {"min", "may", "num", "espc"} for opcion in opciones):
+            pause(Fore.BLACK + Back.RED + "Opciones invalidas." + Style.RESET_ALL)
+            continue
 
-            # Mostrar la contraseña generada.
-            print(Fore.LIGHTYELLOW_EX + "-------------------------------------------------------------------")
-            print(Style.RESET_ALL + f"La contraseña generada es: {contrasena}")
-            print(Fore.LIGHTYELLOW_EX + "-------------------------------------------------------------------")
+        try:
+            password = generar_contrasena(longitud, opciones)
+        except ValueError as exc:
+            pause(Fore.BLACK + Back.RED + str(exc) + Style.RESET_ALL)
+            continue
 
-        elif opcion.lower() == "n":
-            # Salir del bucle si el usuario elige no generar más contraseñas.
-            break
-
-        else:
-            # Manejar la entrada inválida del usuario.
-            print(Fore.BLACK + Back.RED + "\nOpción inválida. Inténtelo de nuevo.")
-            print(Style.RESET_ALL + "")
+        print(Fore.LIGHTYELLOW_EX + "\nContrasena generada:")
+        print(Style.RESET_ALL + password)
+        pause()
 
 
-# Función para mostrar el banner de la aplicación.
 def banner():
-    cartel = r"""
-   ___              _                              _           
-  | _ \____ __ ____| |  __ _ ___ _ _  ___ _ _ __ _| |_ ___ _ _ 
-  |  _(_-< V  V / _` | / _` / -_) ' \/ -_) '_/ _` |  _/ _ \ '_|
-  |_| /__/\_/\_/\__,_| \__, \___|_||_\___|_| \__,_|\__\___/_|  
-                       |___/                                                                        
-    """
-    print(Fore.LIGHTRED_EX + cartel)
-    print(Fore.LIGHTRED_EX + "***************************************************************")
+    draw_banner("", COMMON_ASCII, "Longitud y grupos personalizables", BANNER_COLOR)
 
-# Función para limpiar la pantalla de la consola.
-def clear_screen():
-    os.system("cls" if os.name == "nt" else "clear")
 
-# Lógica principal para ejecutar el generador de contraseñas.
 if __name__ == "__main__":
-    clear_screen()
-    banner()
     password_generator_main()

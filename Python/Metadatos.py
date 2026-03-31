@@ -1,6 +1,11 @@
 import exifread
-import os
 from colorama import Fore, Back, Style
+from Python.ui import draw_banner, pause
+
+COMMON_ASCII = r"""
+ Meta Spy
+"""
+BANNER_COLOR = "\033[90m"
 
 def obtener_metadatos_imagen(ruta_imagen):
     try:
@@ -28,13 +33,8 @@ def obtener_metadatos_archivo(ruta_archivo):
 
 def metadata_main():
     banner()
-    print("\n************************")
-    print("*   TIPO DE ARCHIVO :  *")
-    print("************************")
-    print("*      1. FOTO         *")
-    print("*                      *")
-    print("*      2. DOCUMENTO    *")
-    print("************************")
+    print("\n1. Imagen")
+    print("2. Documento")
 
     while True:
         opcion = input(Style.RESET_ALL + "\nSeleccione el tipo de archivo (1/2) o n para salir: ").strip()
@@ -43,29 +43,19 @@ def metadata_main():
         elif opcion == '1':
             ruta_imagen = input("Ruta de la imagen: ")
             obtener_metadatos_imagen(ruta_imagen)
+            pause()
             break
         elif opcion == '2':
             ruta_archivo = input("Ruta del archivo: ")
             obtener_metadatos_archivo(ruta_archivo)
+            pause()
             break
         else:
             print(Fore.RED + "Opción no válida.")
 
 
 def banner():
-    cartel = r"""
-  __  __     _          ___           
- |  \/  |___| |_ __ _  / __|_ __ _  _ 
- | |\/| / -_)  _/ _` | \__ \ '_ \ || |
- |_|  |_\___|\__\__,_| |___/ .__/\_, |
-                           |_|   |__/ 
-    """
-    clear_screen()
-    print(Fore.CYAN + cartel)
-    print(Fore.CYAN + "************************************************")
-
-def clear_screen():
-    os.system("cls" if os.name == "nt" else "clear")
+    draw_banner("", COMMON_ASCII, "Imagenes y documentos", BANNER_COLOR)
 
 if __name__ == "__main__":
     metadata_main()

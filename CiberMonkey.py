@@ -1,182 +1,274 @@
-import os
-import subprocess
-import sys
-import time
-from colorama import *
+#!/usr/bin/env python3
+"""Punto de entrada principal de Ciber Monkey."""
 
-# Importar los módulos
-from Python.Cal_CIDR import calculate_cidr
-from Python.Wifi_Scanner import wifi_scanner_main
-from Python.Dev_IP_act import host_discovery_main
-from Python.Escucha_ports import escucha_puertos_main
-from Python.ListSubdominios import List_Subdominios_main
-from Python.DDos_atack import ddos_attack_main
-from Python.Pswd_generator import password_generator_main
-from Python.Encriptar_Desencriptar import encriptar_desencriptar_main
-from Python.Data_generator import data_generator_main
-from Python.SQL_injection import sql_injection_main
+from __future__ import annotations
 
+import importlib
+import platform
+import shutil
+from dataclasses import dataclass
+from typing import Callable, Iterable
 
-def print_ascii_art():
+from colorama import Back, Fore, Style, init
+
+from Python.ui import clear_screen, draw_banner, pause
+
+init(autoreset=True)
+
+TITLE_ART = [
+    (Fore.LIGHTCYAN_EX, r"   _______ __                 __  ___            __                                     "),
+    (Fore.LIGHTCYAN_EX, r"  / ____(_) /_  ___  _____   /  |/  /___  ____  / /_____  __  __                        "),
+    (Fore.CYAN,         r" / /   / / __ \/ _ \/ ___/  / /|_/ / __ \/ __ \/ //_/ _ \/ / / /                        "),
+    (Fore.BLUE,         r"/ /___/ / /_/ /  __/ /     / /  / / /_/ / / / / ,< /  __/ /_/ /                         "),
+    (Fore.MAGENTA,      r"\____/_/_.___/\___/_/     /_/  /_/\____/_/ /_/_/|_|\___/\__, /                          "),
+    (Fore.LIGHTMAGENTA_EX, r"                                                       /____/                           "),
+]
+FRAME_COLOR = Fore.LIGHTCYAN_EX
+ACCENT_COLOR = Fore.MAGENTA
+PANEL_WIDTH = 64
+
+@dataclass(frozen=True)
+class MenuOption:
+    key: int
+    label: str
+    action: Callable[[], object]
+
+def print_ascii_art() -> None:
     clear_screen()
-    ascii_art = r"""
-     ___  _  _                 __  __             _              
-    / __|(_)| |__  ___  _ _   |  \/  | ___  _ _  | |__ ___  _  _ 
-   | (__ | || '_ \/ -_)| '_|  | |\/| |/ _ \| ' \ | / // -_)| || |
-    \___||_||_.__/\___||_|    |_|  |_|\___/|_||_||_\_\\___| \_, |
-                                                             _| |
-    ---- By: MARH ------------------------------------------|__/ 
-    """
-    lines = ascii_art.split('\n')  # Dividir el arte ASCII en líneas individuales
-    colors = [
-        Fore.LIGHTMAGENTA_EX,
-        Fore.LIGHTMAGENTA_EX,
-        Fore.MAGENTA,
-        Fore.BLUE,
-        Fore.LIGHTBLUE_EX,
-        Fore.CYAN,
-        Fore.LIGHTCYAN_EX,
-        Fore.CYAN,
-        Fore.BLUE,
-        Fore.LIGHTBLUE_EX,
-        Fore.LIGHTMAGENTA_EX
+    for color, line in TITLE_ART:
+        print(color + Style.BRIGHT + line + Style.RESET_ALL)
+    print(ACCENT_COLOR + " " + "─" * (PANEL_WIDTH - 2))
+    print(
+        FRAME_COLOR
+        + Style.BRIGHT
+        + "  [ BY: Mayky]"
+        + Style.RESET_ALL
+        + Fore.WHITE
+        + f"  Sistema: {platform.system()} {platform.release()}"
+    )
+    print(ACCENT_COLOR + " " + "─" * (PANEL_WIDTH - 2) + Style.RESET_ALL)
+
+
+def print_menu(options: Iterable[MenuOption]) -> None:
+    print(FRAME_COLOR + f"╔{'═' * PANEL_WIDTH}╗")
+    print(FRAME_COLOR + "║" + Fore.WHITE + Style.BRIGHT + " MENU PRINCIPAL".ljust(PANEL_WIDTH) + FRAME_COLOR + "║")
+    print(FRAME_COLOR + f"╠{'═' * PANEL_WIDTH}╣")
+    for option in options:
+        line = f" {option.key:>2}. {option.label}"
+        print(FRAME_COLOR + "║" + Fore.CYAN + line.ljust(PANEL_WIDTH) + FRAME_COLOR + "║")
+    print(FRAME_COLOR + f"╠{'═' * PANEL_WIDTH}╣")
+    print(FRAME_COLOR + "║" + Fore.LIGHTCYAN_EX + " 98. Diagnostico del entorno".ljust(PANEL_WIDTH) + FRAME_COLOR + "║")
+    print(FRAME_COLOR + "║" + Fore.LIGHTRED_EX + " 99. Salir del programa".ljust(PANEL_WIDTH) + FRAME_COLOR + "║")
+    print(FRAME_COLOR + f"╚{'═' * PANEL_WIDTH}╝")
+    print()
+    print(
+        ACCENT_COLOR
+        + " Estado: "
+        + Fore.GREEN
+        + "READY"
+    )
+
+
+def get_menu_options() -> list[MenuOption]:
+    return [
+        MenuOption(1, "DB Audit", run_audit_db_menu),
+        MenuOption(2, "Calc CIDR", lazy_action("Python.Cal_CIDR", "calculate_cidr")),
+        MenuOption(3, "Data Gen", lazy_action("Python.Data_generator", "data_generator_main")),
+        MenuOption(4, "DDoS", lazy_action("Python.DDos_atack", "ddos_attack_main")),
+        MenuOption(5, "File Guardian", lazy_action("Python.Encriptar_Desencriptar", "encriptar_desencriptar_main")),
+        MenuOption(6, "Port Listener", lazy_action("Python.Escucha_ports", "escucha_puertos_main")),
+        MenuOption(7, "Meta Spy", lazy_action("Python.Metadatos", "metadata_main")),
+        MenuOption(8, "Pwd Generator", lazy_action("Python.Pswd_generator", "password_generator_main")),
+        MenuOption(9, "SQL Injection", lazy_action("Python.SQL_injection", "sql_injection_main")),
+        MenuOption(10, "Sub Finder", lazy_action("Python.Subdomain_Enum", "subdomain_enum_main")),
+        MenuOption(11, "Wifi Scanner", lazy_action("Python.Wifi_Scanner", "wifi_scanner_main")),
     ]
 
-    #  Iterar sobre cada línea y su respectivo color
-    for line, color in zip(lines, colors * (len(lines) // len(colors) + 1)):
-        #  Imprimir la línea con el color y estilo BRIGHT
-        print(color + Style.BRIGHT + line)
+
+def run_audit_db_menu() -> None:
+    module = importlib.import_module("Python.Auditar_BD")
+    if hasattr(module, "banner"):
+        module.banner()
+    print(Fore.CYAN + "Auditoria guiada de MySQL / MariaDB\n")
+
+    host = input("Host [127.0.0.1]: ").strip() or "127.0.0.1"
+    if host.lower() == "n":
+        return
+
+    port_raw = input("Puerto [3306]: ").strip() or "3306"
+    user = input("Usuario: ").strip()
+    if user.lower() == "n":
+        return
+    password = input("Password: ").strip()
+    schema = input("Base de datos / schema: ").strip()
+    if not user or not schema:
+        pause(Fore.BLACK + Back.RED + "Usuario y schema son obligatorios." + Style.RESET_ALL)
+        return
+
+    try:
+        port = int(port_raw)
+    except ValueError:
+        pause(Fore.BLACK + Back.RED + "Puerto no valido." + Style.RESET_ALL)
+        return
+
+    ssl_answer = input("Usar SSL/TLS? (s/n) [n]: ").strip().lower() or "n"
+    use_ssl = ssl_answer == "s"
+    pattern = input("Patron opcional para buscar (Enter para omitir): ").strip() or None
+
+    try:
+        with module.connect(host, user, password, port, schema, use_ssl) as conn:
+            grants = module.check_user_permissions(conn)
+            cfg = module.analyze_security_configurations(conn)
+            suspects = module.detect_plaintext_password_columns(conn, schema)
+
+            print(Fore.GREEN + "\nConexion correcta.\n")
+
+            print(Fore.CYAN + "[Permisos]")
+            if grants:
+                for grant in grants[:5]:
+                    print(f"- {grant}")
+                if len(grants) > 5:
+                    print(f"- ... y {len(grants) - 5} mas")
+            else:
+                print("- No se pudieron leer grants")
+
+            print(Fore.CYAN + "\n[Configuracion]")
+            print(f"- Version: {cfg.get('version', 'N/A')}")
+            print(f"- Modo SQL: {cfg.get('global_sql_mode', 'N/A')}")
+            print(f"- local_infile: {cfg.get('global_local_infile', 'N/A')}")
+            print(f"- secure_transport: {cfg.get('require_secure_transport', 'N/A')}")
+
+            print(Fore.CYAN + "\n[Columnas sensibles]")
+            if suspects:
+                for table, column, data_type in suspects[:10]:
+                    print(f"- {table}.{column} ({data_type})")
+                if len(suspects) > 10:
+                    print(f"- ... y {len(suspects) - 10} mas")
+            else:
+                print("- No se detectaron columnas sospechosas por nombre")
+
+            if pattern:
+                findings = module.find_sensitive_data(
+                    conn,
+                    schema=schema,
+                    pattern=pattern,
+                    max_rows_per_column=3,
+                    count_only=True,
+                )
+                print(Fore.CYAN + f"\n[Busqueda: {pattern}]")
+                if findings:
+                    for finding in findings[:10]:
+                        print(f"- {finding.table}.{finding.column}: {finding.count} coincidencias")
+                    if len(findings) > 10:
+                        print(f"- ... y {len(findings) - 10} mas")
+                else:
+                    print("- Sin coincidencias")
+
+    except Exception as exc:
+        pause(Fore.BLACK + Back.RED + f"Auditoria fallida: {exc}" + Style.RESET_ALL)
+        return
+
+    pause()
 
 
-def print_menu():
-    print(Fore.BLUE + "|================================|")
-    print("| 1. CALCULAR CIDR               |")
-    print("| 2. WIFI SCANNER                |")
-    print("| 3. DESCUBRIR IP ACTIVA         |")
-    print("| 4. ESCUCHA DE PUERTOS          |")
-    print("| 5. LISTAR SUBDOMINIOS          |")
-    print("| 6. ATAQUE DDoS                 |")
-    print("| 7. CREAR CONTRASEÑA            |")
-    print("| 8. EN / DESENCRIPTAR ARCHIVO   |")
-    print("| 9. GENERAR DATOS               |")
-    print("| 10. INYECCIÓN SQL              |")
-    print("| 11. AUDITAR BD SQL (disabled)  |")
-    print("|--------------------------------|")
-    print("| 99. SALIR DEL PROGRAMA         |")
-    print("|================================|")
+def import_available(module_name: str) -> bool:
+    try:
+        importlib.import_module(module_name)
+        return True
+    except Exception:
+        return False
 
 
-def salir():
-    ascii_art = r"""
-         ___   _   _    ___ ___ _  _ ___   ___           
-        / __| /_\ | |  |_ _| __| \| |   \ / _ \          
-        \__ \/ _ \| |__ | || _|| .  | |) | (_) |   _   _ 
-        |___/_/ \_\____|___|___|_|\_|___/ \___(_) (_) (_)
+def lazy_action(module_name: str, function_name: str) -> Callable[[], object]:
+    def runner() -> object:
+        module = importlib.import_module(module_name)
+        return getattr(module, function_name)()
 
-        * Linkedin: https://www.linkedin.com/in/mardh   
-        * GitHub: https://github.com/Mayky23 
-    """
-    print(ascii_art)
+    return runner
 
 
-def switch_options(option):
-    options_dict = {
-        1: calculate_cidr,
-        2: wifi_scanner_main,
-        3: host_discovery_main,
-        4: escucha_puertos_main,
-        5: List_Subdominios_main,
-        6: ddos_attack_main,
-        7: password_generator_main,
-        8: encriptar_desencriptar_main,
-        9: data_generator_main,
-        10: sql_injection_main,
-        #   11: sql_injection_main,
-        99: salir
-    }
-    func = options_dict.get(option)
-    if func:
-        func()
+def run_doctor() -> None:
+    print_ascii_art()
+    essential_checks = [
+        ("requests", import_available("requests")),
+        ("cryptography", import_available("cryptography")),
+        ("pymysql", import_available("pymysql")),
+        ("dnspython", import_available("dns")),
+        ("exifread", import_available("exifread")),
+        ("scapy", import_available("scapy.all")),
+        ("nmap", shutil.which("nmap") is not None),
+        ("ping", shutil.which("ping") is not None),
+        ("sqlmap", shutil.which("sqlmap") is not None),
+    ]
+    optional_checks = [
+        ("pywifi", import_available("pywifi")),
+        ("amass", shutil.which("amass") is not None),
+        ("subfinder", shutil.which("subfinder") is not None),
+        ("assetfinder", shutil.which("assetfinder") is not None),
+        ("gobuster", shutil.which("gobuster") is not None),
+        ("ffuf", shutil.which("ffuf") is not None),
+    ]
+
+    print(Fore.CYAN + "Revision rapida del entorno:\n" + Style.RESET_ALL)
+
+    missing_essential = [name for name, ok in essential_checks if not ok]
+    missing_optional = [name for name, ok in optional_checks if not ok]
+
+    if not missing_essential:
+        print(Fore.GREEN + "[OK] Base principal lista")
     else:
-        print(Fore.BLACK + Back.RED + "Opción no válida." + Style.RESET_ALL)
+        print(Fore.RED + "[FALTA] Base principal: " + ", ".join(missing_essential))
 
-def clear_screen():
-    os.system("cls" if os.name == "nt" else "clear")
-
-# Instala las dependencias necesarias para la aplicación
-def install_dependencies(dependencies):
-    clear_screen()  
-    installed_packages = subprocess.check_output(['pip', 'freeze']).decode('utf-8').split('\n')  # Obtiene las dependencias instaladas
-    required_packages = [dependency.split('==')[0] for dependency in dependencies]  # Extrae los nombres de las dependencias requeridas
-
-    print("[-] Verificando dependencias...") 
-    missing_dependencies = []  # Lista para almacenar las dependencias faltantes
-
-    # Verifica si las dependencias requeridas están instaladas
-    for dependency in required_packages:
-        if dependency not in installed_packages:
-            missing_dependencies.append(dependency)  # Si falta alguna, se agrega a la lista de dependencias faltantes
-
-    if not missing_dependencies:  # Si no hay dependencias faltantes
-        print(Fore.GREEN + "[-] Todas las dependencias ya están instaladas." + Style.RESET_ALL)
-        time.sleep(2)  # Espera 1 segundo
+    if missing_optional:
+        print(Fore.YELLOW + "[OPCIONAL] Pendiente: " + ", ".join(missing_optional))
     else:
-        print(Fore.YELLOW + "\n[!] Las siguientes dependencias faltan por instalar:" + Style.RESET_ALL)  # Mensaje de dependencias faltantes
-        print("____________________________________________________")  # Línea divisoria
-        
-        # Imprime las dependencias faltantes
-        for dependency in missing_dependencies:
-            print("\n -" ,dependency)
-        time.sleep(1)  # Espera 1 segundo
+        print(Fore.GREEN + "[OK] Extras disponibles")
 
-        total_dependencies = len(missing_dependencies)  # Calcula el total de dependencias faltantes
-        progress_unit = 100 / total_dependencies  # Calcula la unidad de progreso por dependencia
-        progress = 0  # Inicializa el progreso en 0
+    print(Fore.WHITE + "\nUsa `install.sh` en Linux/Kali o `install.ps1` en Windows para completar lo que falte.")
+    pause()
 
-        # Instala las dependencias faltantes
-        for index, dependency in enumerate(missing_dependencies, start=1):
-            print(Fore.RESET + "\nInstalando dependencia {} de {}...".format(index, total_dependencies))  # Mensaje de instalación de la dependencia
-            try:
-                subprocess.check_output(['pip', 'install', dependency])  # Intenta instalar la dependencia utilizando pip
-            except subprocess.CalledProcessError:
-                print(Fore.RED + f"No se pudo instalar la dependencia: {dependency}" + Style.RESET_ALL)  # Si hay un error, muestra un mensaje de error
 
-            # Simula progreso
-            time.sleep(1)  # Espera 1 segundo
+def salir() -> None:
+    clear_screen()
+    print(Fore.LIGHTCYAN_EX + Style.BRIGHT + "Ciber Monkey" + Style.RESET_ALL)
+    print(Fore.MAGENTA + "Sesion cerrada.\n" + Style.RESET_ALL)
 
-            # Actualiza la barra de progreso
-            progress += progress_unit  # Incrementa el progreso por la unidad de progreso
-            bar_length = 20  # Longitud de la barra de progreso
-            bar = "=" * int(progress / (100 / bar_length))  # Calcula la cantidad de "=" en la barra de progreso
-            spaces = " " * (bar_length - len(bar))  # Calcula los espacios restantes en la barra de progreso
-            percent = "{}%".format(int(progress))  # Calcula el porcentaje completado
-            print("\rProgreso: [{}{}] {}".format(bar, spaces, percent.rjust(4)), end='', flush=True)  # Imprime la barra de progreso
-            time.sleep(5)  # Espera 5 segundos
 
-        print(Fore.RESET + Back.GREEN + "\nTodas las dependencias se han instalado correctamente." + Style.RESET_ALL)  # Mensaje de que todas las dependencias se han instalado correctamente
-    return True  # Retorna True cuando todas las dependencias están instaladas correctamente
+def main() -> None:
+    options = get_menu_options()
+    options_by_key = {option.key: option.action for option in options}
 
-# Función principal
-def main():
-    dependencies = [""]  # Lista de dependencias necesarias
-    if install_dependencies(dependencies):  # Llama a la función para instalar las dependencias y verifica si todas se instalan correctamente
-        while True: 
-            try:
-                clear_screen()
-                print_ascii_art()
-                print_menu()
+    while True:
+        print_ascii_art()
+        print_menu(options)
+        try:
+            option = int(input("\nSelecciona una opcion: ").strip())
+        except ValueError:
+            print(Fore.BLACK + Back.RED + "Introduce un numero valido." + Style.RESET_ALL)
+            pause()
+            continue
 
-                option = int(input("\nSELECCIONA UNA OPCIÓN: " + Fore.RESET))  # Solicita al usuario seleccionar una opción
-                if option == 99:  # Si la opción es 99
-                    salir()  # Llama a la función para salir
-                    break  # Rompe el bucle
+        if option == 99:
+            salir()
+            break
+        if option == 98:
+            run_doctor()
+            continue
 
-                switch_options(option)  # Llama a la función para manejar las opciones
+        action = options_by_key.get(option)
+        if action is None:
+            print(Fore.BLACK + Back.RED + "Opcion no valida." + Style.RESET_ALL)
+            pause()
+            continue
 
-            except ValueError:  # Si hay un error al convertir la entrada del usuario a un entero
-                print(Fore.BLACK + Back.RED + "Por favor, ingresa un número válido." + Style.RESET_ALL)  # Muestra un mensaje de error
-                continue  # Continúa con la siguiente iteración del bucle
-
+        try:
+            action()
+        except KeyboardInterrupt:
+            print(Fore.YELLOW + "\nOperacion cancelada por el usuario.")
+            pause()
+        except Exception as exc:
+            print(Fore.BLACK + Back.RED + f"Se produjo un error: {exc}" + Style.RESET_ALL)
+            pause()
 
 
 if __name__ == "__main__":

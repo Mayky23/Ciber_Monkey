@@ -1,151 +1,115 @@
-# Importación de módulos necesarios de la biblioteca cryptography para la generación de claves y cifrado.
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from __future__ import annotations
+
+import os
+from pathlib import Path
+
+from colorama import Back, Fore, Style, init
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-# Importación del módulo 'os' para manipulación de archivos y del módulo 'colorama' para mejorar la presentación en consola.
-import os
-from colorama import Fore, Back, Style
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from Python.ui import draw_banner, pause
 
-# Definición de la función para obtener la ruta donde se guardará el archivo encriptado/desencriptado.
-def obtener_ruta_guardado():
+init(autoreset=True)
+COMMON_ASCII = r"""
+ File Guardian
+"""
+BANNER_COLOR = "\033[95m"
+
+
+def banner():
+    draw_banner("", COMMON_ASCII, "Cifrar y descifrar archivos locales", BANNER_COLOR)
+
+
+def derive_key(password: bytes, salt: bytes) -> bytes:
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        iterations=200000,
+        backend=default_backend(),
+    )
+    return kdf.derive(password)
+
+
+def read_existing_path(prompt: str) -> Path:
     while True:
-        ruta = input("Ingrese la ruta donde se guardará el archivo encriptado/desencriptado: ")
-        # Verifica si la ruta especificada es un directorio válido.
-        if os.path.isdir(os.path.dirname(ruta)):
-            return ruta
-        else:
-            # Informa al usuario que la ruta especificada no es válida.
-            print(Fore.BLACK + Back.RED + "La ruta especificada no es válida. Inténtelo de nuevo." + Style.RESET_ALL)
+        path = Path(input(prompt).strip().strip('"')).expanduser()
+        if path.exists() and path.is_file():
+            return path
+        print(Fore.BLACK + Back.RED + "Archivo no valido." + Style.RESET_ALL)
 
-# Definición de la función para obtener la ruta del archivo a encriptar/desencriptar.
-def obtener_ruta_archivo():
+
+def read_output_directory() -> Path:
     while True:
-        ruta = input("Ingrese la ruta del archivo: ")
-        # Verifica si la ruta especificada existe.
-        if os.path.exists(ruta):
-            return ruta
-        else:
-            # Informa al usuario que la ruta especificada no existe.
-            print(Fore.BLACK + Back.RED + "La ruta especificada no existe. Inténtelo de nuevo." + Style.RESET_ALL)
+        path = Path(input("Directorio de salida: ").strip().strip('"')).expanduser()
+        if path.exists() and path.is_dir():
+            return path
+        print(Fore.BLACK + Back.RED + "Directorio no valido." + Style.RESET_ALL)
 
-# Definición de la función para obtener la clave de encriptación/desencriptación.
-def obtener_clave():
-    clave = input("Ingrese la clave de encriptación/desencriptación: ")
-    return clave.encode()
 
-# Definición de la función para encriptar un archivo.
-def encriptar_archivo(ruta, clave, ruta_guardado):
-    with open(ruta, "rb") as archivo:
-        datos = archivo.read()
+def read_password() -> bytes:
+    password = input("Clave de cifrado/descifrado: ").strip()
+    return password.encode("utf-8")
 
-    # Generación de un valor aleatorio como sal para el algoritmo PBKDF2.
+
+def encrypt_file(source: Path, password: bytes, output_dir: Path) -> Path:
+    data = source.read_bytes()
     salt = os.urandom(16)
-    # Creación de un objeto PBKDF2HMAC para derivar una clave a partir de la clave ingresada.
-    kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=100000, backend=default_backend())
-    clave_derivada = kdf.derive(clave)
+    iv = os.urandom(16)
+    key = derive_key(password, salt)
+    cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=default_backend())
+    encrypted = cipher.encryptor().update(data)
 
-    # Creación de un objeto Cipher para cifrar los datos usando AES en modo CFB.
-    cipher = Cipher(algorithms.AES(clave_derivada), modes.CFB(salt), backend=default_backend())
-    encryptor = cipher.encryptor()
-    datos_encriptados = encryptor.update(datos) + encryptor.finalize()
+    out_path = output_dir / f"{source.stem}.enc"
+    out_path.write_bytes(salt + iv + encrypted)
+    return out_path
 
-    # Nombre del archivo encriptado.
-    nombre_archivo = "encriptado_" + os.path.basename(ruta)
-    ruta_archivo_encriptado = os.path.join(ruta_guardado, nombre_archivo)
 
-    # Escritura de los datos encriptados en un nuevo archivo.
-    with open(ruta_archivo_encriptado, "wb") as archivo_encriptado:
-        archivo_encriptado.write(salt + datos_encriptados)
+def decrypt_file(source: Path, password: bytes, output_dir: Path) -> Path:
+    payload = source.read_bytes()
+    if len(payload) < 32:
+        raise ValueError("El archivo cifrado es demasiado pequeno o no tiene formato valido.")
+    salt, iv, encrypted = payload[:16], payload[16:32], payload[32:]
+    key = derive_key(password, salt)
+    cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=default_backend())
+    decrypted = cipher.decryptor().update(encrypted)
 
-    # Informa al usuario que el archivo ha sido encriptado y guardado exitosamente.
-    print(Fore.BLACK + Back.GREEN + "Archivo encriptado y guardado en {} exitosamente.".format(ruta_archivo_encriptado) + Style.RESET_ALL)
+    base_name = source.name[:-4] if source.name.endswith(".enc") else f"{source.name}.dec"
+    out_path = output_dir / base_name
+    out_path.write_bytes(decrypted)
+    return out_path
 
-# Definición de la función para desencriptar un archivo.
-def desencriptar_archivo(ruta, clave, ruta_guardado):
-    with open(ruta, "rb") as archivo_encriptado:
-        datos_encriptados = archivo_encriptado.read()
 
-    # Extrae el valor del salt del inicio de los datos encriptados.
-    salt = datos_encriptados[:16]
-    datos_encriptados = datos_encriptados[16:]
-
-    # Derivación de la clave utilizando el mismo salt y algoritmo PBKDF2HMAC.
-    kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=100000, backend=default_backend())
-    clave_derivada = kdf.derive(clave)
-
-    # Creación de un objeto Cipher para descifrar los datos usando AES en modo CFB.
-    cipher = Cipher(algorithms.AES(clave_derivada), modes.CFB(salt), backend=default_backend())
-    decryptor = cipher.decryptor()
-    datos_desencriptados = decryptor.update(datos_encriptados) + decryptor.finalize()
-
-    # Nombre del archivo desencriptado.
-    nombre_archivo = "desencriptado_" + os.path.basename(ruta)
-    ruta_archivo_desencriptado = os.path.join(ruta_guardado, nombre_archivo)
-
-    # Escritura de los datos desencriptados en un nuevo archivo.
-    with open(ruta_archivo_desencriptado, "wb") as archivo_desencriptado:
-        archivo_desencriptado.write(datos_desencriptados)
-
-    # Informa al usuario que el archivo ha sido desencriptado y guardado exitosamente.
-    print(Fore.BLACK + Back.GREEN + "Archivo desencriptado y guardado en {} exitosamente.".format(ruta_archivo_desencriptado) + Style.RESET_ALL)
-
-# Definición de la función principal para encriptar o desencriptar archivos.
 def encriptar_desencriptar_main():
     while True:
-        clear_screen()
         banner()
-        mostrar_menu()
-        # Solicita al usuario elegir entre encriptar, desencriptar o salir.
-        opcion = input(Style.RESET_ALL + "¿Desea encriptar (1) o desencriptar (2)? 'n' para terminar: ")
+        print("\n1. Cifrar archivo")
+        print("2. Descifrar archivo")
+        print("n. Volver")
+        option = input("\nSelecciona una opcion: ").strip().lower()
 
-        if opcion.lower() == "n":
-            break
+        if option == "n":
+            return
+        if option not in {"1", "2"}:
+            pause(Fore.RED + "Opcion no valida. Pulsa Enter para continuar...")
+            continue
 
-        if opcion == "1":
-            ruta_archivo = obtener_ruta_archivo()
-            clave = obtener_clave()
-            ruta_guardado = obtener_ruta_guardado()
-            encriptar_archivo(ruta_archivo, clave, ruta_guardado)
+        source = read_existing_path("Ruta del archivo: ")
+        password = read_password()
+        output_dir = read_output_directory()
 
-        elif opcion == "2":
-            ruta_archivo = obtener_ruta_archivo()
-            clave = obtener_clave()
-            ruta_guardado = obtener_ruta_guardado()
-            desencriptar_archivo(ruta_archivo, clave, ruta_guardado)
+        try:
+            if option == "1":
+                out_path = encrypt_file(source, password, output_dir)
+                print(Fore.GREEN + f"Archivo cifrado correctamente: {out_path}")
+            else:
+                out_path = decrypt_file(source, password, output_dir)
+                print(Fore.GREEN + f"Archivo descifrado correctamente: {out_path}")
+        except Exception as exc:
+            print(Fore.BLACK + Back.RED + f"Operacion fallida: {exc}" + Style.RESET_ALL)
+        pause()
 
-        else:
-            # Informa al usuario que la opción ingresada no es válida.
-            print(Fore.BLACK + Back.RED + "Opción no válida." + Style.RESET_ALL)
 
-# Definición de la función para mostrar el menú principal.
-def mostrar_menu():
-    clear_screen()
-    banner()
-    print("************************")
-    print("*         FILE         *")
-    print("************************")
-    print("*    1. Encriptar      *")
-    print("*                      *")
-    print("*    2. Desencriptar   *")
-    print("************************")
-
-# Función para mostrar un banner ASCII art en la consola.
-def banner():
-    cartel = r"""
-   ___ _ _        ___                  _ _           
-  | __(_) |___   / __|_  _ __ _ _ _ __| (_)__ _ _ _  
-  | _|| | / -_) | (_ | || / _` | '_/ _` | / _` | ' \ 
-  |_| |_|_\___|  \___|\_,_\__,_|_| \__,_|_\__,_|_||_|
-    """
-    print(Fore.WHITE + cartel)
-
-# Función para limpiar la pantalla de la consola.
-def clear_screen():
-    os.system("cls" if os.name == "nt" else "clear")
-
-# Llamada a la función principal para mostrar el menú y ejecutar la encriptación o desencriptación de archivos.
 if __name__ == "__main__":
-    clear_screen()
-    mostrar_menu()
     encriptar_desencriptar_main()

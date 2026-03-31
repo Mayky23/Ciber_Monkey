@@ -1,149 +1,103 @@
-import msvcrt
-import os
 import random
-from colorama import *
+from colorama import Fore, Style, init
+from Python.ui import draw_banner, pause
 
-# Inicializar colorama
-init()
+init(autoreset=True)
+COMMON_ASCII = r"""
+ Data Gen
+"""
+BANNER_COLOR = "\033[92m"
 
-# Definir listas de datos para la generación de información personal
-ALPHABET = [
-    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
-    "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
-]
-
+ALPHABET = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 FIRST_NAMES = [
-    "Juan", "María", "José", "Laura", "Carlos", "Sofía", "Luis", "Ana", "Pedro", "Marta",
-    "Alejandro", "Isabella", "Diego", "Valentina", "Gabriel",
-    "Fernando", "Adriana", "Miguel", "Elena", "Ricardo", "Beatriz", "Javier", "Claudia", "Raúl",
-    "Natalia", "Roberto", "Monica", "Daniel", "Carolina", "Hugo", "Victoria", "Fabiola", "Eduardo",
-    "Carmen", "Ángel", "Renata", "Pablo", "Lucía", "Raul", "Olivia", "Andrés", "Silvia", "Francisco"
+    "Juan", "Maria", "Jose", "Laura", "Carlos", "Sofia", "Luis", "Ana",
+    "Pedro", "Marta", "Alejandro", "Isabella", "Diego", "Valentina",
+    "Gabriel", "Fernando", "Adriana", "Miguel", "Elena", "Ricardo",
+    "Beatriz", "Javier", "Claudia", "Raul", "Natalia", "Roberto",
+    "Monica", "Daniel", "Carolina", "Hugo", "Victoria", "Fabiola",
+    "Eduardo", "Carmen", "Angel", "Renata", "Pablo", "Lucia",
+    "Olivia", "Andres", "Silvia", "Francisco",
 ]
-
 LAST_NAMES = [
-    "Gómez", "Rodríguez", "Fernández", "López", "Pérez", "González", "Martínez", "Sánchez", "Romero", "Torres",
-    "Ortega", "Hernández", "Silva", "Ramírez", "Chavez", "Luna", "Mendoza", "Guerrero", "Cruz", "Vargas", 
-    "Cabrera", "Cortez", "Román", "Castañeda", "Zapata", "Aguirre", "Moreno", "Delgado", "Ramos", "Orozco", 
-    "Soto", "Molina", "Cisneros", "Fuentes", "Vega", "Giménez", "Rosales", "Flores", "Valdez", "Acosta", "Herrera", "Núñez", 
-    "Carrillo", "Lara", "Escobar"
+    "Gomez", "Rodriguez", "Fernandez", "Lopez", "Perez", "Gonzalez",
+    "Martinez", "Sanchez", "Romero", "Torres", "Ortega", "Hernandez",
+    "Silva", "Ramirez", "Chavez", "Luna", "Mendoza", "Guerrero", "Cruz",
+    "Vargas", "Cabrera", "Cortez", "Roman", "Castaneda", "Zapata",
+    "Aguirre", "Moreno", "Delgado", "Ramos", "Orozco", "Soto", "Molina",
+    "Cisneros", "Fuentes", "Vega", "Gimenez", "Rosales", "Flores",
+    "Valdez", "Acosta", "Herrera", "Nunez", "Carrillo", "Lara", "Escobar",
 ]
-
 BANKS = [
-    "Banco Santander", "BBVA", "CaixaBank", "Bankia", "Banco Sabadell",
-    "Banco Popular", "ING Direct", "Bankinter", "Caja Rural",
+    "Banco Santander", "BBVA", "CaixaBank", "Banco Sabadell", "Bankinter",
     "Kutxabank", "Abanca", "Unicaja Banco", "Ibercaja", "Deutsche Bank",
-    "Société Générale", "Barclays", "HSBC", "BNP Paribas", "Citibank"
+    "Barclays", "HSBC", "BNP Paribas", "Citibank",
 ]
-
 EMAIL_DOMAINS = [
-    "gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "aol.com",
-    "icloud.com", "mail.com", "live.com", "protonmail.com", "example.com"
+    "gmail.com", "outlook.com", "hotmail.com", "protonmail.com", "example.com",
 ]
+def banner():
+    draw_banner("", COMMON_ASCII, "Datos ficticios para pruebas", BANNER_COLOR)
 
-# Función principal para la generación de datos personales.
-def data_generator_main():
-    while True:
-        banner()
-        response = get_input("¿Cuántas personas deseas generar? (Escribe 'n' para terminar): ")
 
-        if response.lower() == "n":
-            break
-
-        try:
-            num_people = int(response)
-
-            for i in range(num_people):
-                print(f"Datos de la persona #{i + 1}")
-                print("-----------------------------------------------------")
-                dni = generate_dni()
-                name, email = generate_name_and_email()
-                bank_account = generate_bank_account()
-                date_of_birth = generate_date_of_birth()
-                password = generate_password()
-                
-                # Mostrar los datos generados de la persona.
-                print("DNI:", dni)
-                print("Nombre:", name)
-                print("Email:", email)
-                print("Cuenta bancaria:", bank_account)
-                print("Fecha de nacimiento:", date_of_birth)
-                print("Contraseña:", password)
-                print("-----------------------------------------------------")
-
-        except ValueError:
-            print("Error: Ingresa un número válido o escribe 'n' para terminar.")
-
-# Función para leer una entrada de usuario sin necesidad de presionar Enter
-def get_input(prompt):
-    print(prompt, end='', flush=True)
-    input_str = ''
-    while True:
-        key = msvcrt.getwch()
-        if key == '\r':  # Si se presiona Enter
-            break
-        elif key == '\b':  # Si se presiona la tecla de retroceso
-            if input_str:
-                input_str = input_str[:-1]
-                print('\b \b', end='', flush=True)
-        else:
-            input_str += key
-            print(key, end='', flush=True)
-    print()  # Imprime un salto de línea después de la entrada del usuario
-    return input_str
-
-# Función para generar un DNI aleatorio.
 def generate_dni():
-    dni = ''.join(str(random.randint(0, 9)) for _ in range(8))
-    return f"{dni}{random.choice(ALPHABET)}"
+    base = "".join(str(random.randint(0, 9)) for _ in range(8))
+    return f"{base}{random.choice(ALPHABET)}"
 
-# Función para generar un nombre y un email aleatorios.
+
 def generate_name_and_email():
     first_name = random.choice(FIRST_NAMES)
     last_name = random.choice(LAST_NAMES)
     domain = random.choice(EMAIL_DOMAINS)
+    alias = f"{first_name.lower()}.{last_name.lower()}{random.randint(10, 99)}"
+    return f"{first_name} {last_name}", f"{alias}@{domain}"
 
-    full_name = f"{first_name} {last_name}"
-    
-    # Generar un email utilizando la primera letra del nombre y el apellido completo
-    email = f"{first_name.lower()[0]}{last_name.lower()}@{domain}"
 
-    return full_name, email
-
-# Función para generar una cuenta bancaria aleatoria.
 def generate_bank_account():
+    iban_body = "".join(str(random.randint(0, 9)) for _ in range(20))
     bank = random.choice(BANKS)
-    account_number = ''.join(str(random.randint(0, 9)) for _ in range(10))
-    return f"{bank} - {account_number}"
+    return f"{bank} - ES{random.randint(10, 99)} {iban_body[:4]} {iban_body[4:8]} {iban_body[8:12]} {iban_body[12:16]} {iban_body[16:]}"
 
-# Función para generar una fecha de nacimiento aleatoria.
+
 def generate_date_of_birth():
-    year = random.randint(1970, 2019)
+    year = random.randint(1970, 2005)
     month = random.randint(1, 12)
     day = random.randint(1, 28)
     return f"{year:04d}-{month:02d}-{day:02d}"
 
-# Función para generar una contraseña aleatoria.
+
 def generate_password():
-    length = 8
-    characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()"
-    password = ''.join(random.choice(characters) for _ in range(length))
-    return password
+    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*"
+    return "".join(random.choice(chars) for _ in range(12))
 
-# Función para mostrar el banner de la aplicación.
-def banner():
-    cartel = r"""
-  ___       _           ___                       _           
- |   \ __ _| |_ __ _   / __|___ _ _  ___ _ _ __ _| |_ ___ _ _ 
- | |) / _` |  _/ _` | | (_ / -_) ' \/ -_) '_/ _` |  _/ _ \ '_|
- |___/\__,_|\__\__,_|  \___\___|_||_\___|_| \__,_|\__\___/_|  
-                                                            
-    """
-    print(Fore.LIGHTYELLOW_EX + cartel)
-    print("**************************************************************" + Style.RESET_ALL)
 
-# Función para limpiar la pantalla de la consola.
-def clear_screen():
-    os.system("cls" if os.name == "nt" else "clear")
+def data_generator_main():
+    while True:
+        banner()
+        response = input("Cuantas identidades ficticias deseas generar? ('n' para volver): ").strip()
+        if response.lower() == "n":
+            return
+        try:
+            num_people = int(response)
+            if num_people <= 0:
+                raise ValueError
+        except ValueError:
+            pause(Fore.RED + "Introduce un numero entero positivo. Pulsa Enter para continuar...")
+            continue
+
+        banner()
+        for i in range(1, num_people + 1):
+            name, email = generate_name_and_email()
+            print(Fore.CYAN + f"Persona #{i}")
+            print("-" * 60)
+            print("DNI:", generate_dni())
+            print("Nombre:", name)
+            print("Email:", email)
+            print("Cuenta bancaria:", generate_bank_account())
+            print("Fecha de nacimiento:", generate_date_of_birth())
+            print("Password:", generate_password())
+            print("-" * 60)
+        pause()
+
 
 if __name__ == "__main__":
     data_generator_main()

@@ -1,46 +1,46 @@
-import os
+from __future__ import annotations
+
 import ipaddress
-from colorama import Fore, Back, Style
+
+from colorama import Back, Fore, Style, init
+from Python.ui import draw_banner, pause
+
+init(autoreset=True)
+COMMON_ASCII = r"""
+ Calc CIDR
+"""
+BANNER_COLOR = "\033[94m"
 
 def banner():
-    cartel = r"""
-       __      _       ___ ___ ___  ___
-     / __|__ _| |__   / __|_ _|   \| _ \
-    | (__/ _` | / _| | (__ | || |) |   /   
-     \___\__,_|_\__|  \___|___|___/|_|_\
-                                             
-    """
-    clear_screen()
-    print(Fore.BLUE + cartel)
-    print(Fore.BLUE + "************************************************")
+    draw_banner("", COMMON_ASCII, "IPv4 / IPv6", BANNER_COLOR)
 
-# Función para calcular el CIDR (Classless Inter-Domain Routing)
+
 def calculate_cidr():
     while True:
-        clear_screen() 
         banner()
-
-        # Solicita al usuario la IP
-        ip_string = input(Style.RESET_ALL + "\nIngrese una dirección IP ('n' para terminar): ")
-
-        if ip_string.lower() == "n":
-            break
+        value = input("Introduce IP/CIDR ('n' para volver): ").strip()
+        if value.lower() == "n":
+            return
 
         try:
-            # Intenta crear un objeto de red IP a partir de la cadena proporcionada
-            ip_network = ipaddress.ip_network(ip_string, strict=False)
-            print(f"{ip_network}")  # Muestra la red IP calculada , f para respetar el formato de ip de red
-            input(Style.RESET_ALL + "Presione Enter para continuar...")
-        except ValueError:
-            # Si se produce un error de valor, se vuelve a pedir la IP
-            print(Fore.BLACK + Back.RED + "Dirección IP inválida. Inténtelo de nuevo.")
-            input(Style.RESET_ALL + "Presione Enter para continuar...")
-            continue  # Continúa con la próxima iteración del bucle si hay un error
+            network = ipaddress.ip_network(value, strict=False)
+        except ValueError as exc:
+            pause(Fore.BLACK + Back.RED + f"Entrada invalida: {exc}" + Style.RESET_ALL)
+            continue
 
+        print(Fore.CYAN + f"Red: {network}")
+        print(f"Version IP: IPv{network.version}")
+        print(f"Direccion de red: {network.network_address}")
+        if network.version == 4:
+            print(f"Broadcast: {network.broadcast_address}")
+        print(f"Prefijo: /{network.prefixlen}")
+        print(f"Mascara: {getattr(network, 'netmask', 'N/A')}")
+        print(f"Hosts totales: {network.num_addresses}")
 
-def clear_screen():
-    os.system("cls" if os.name == "nt" else "clear")
-
-if __name__ == "__main__":
-    clear_screen()
-    calculate_cidr()
+        hosts = list(network.hosts())
+        if hosts:
+            print(f"Primer host: {hosts[0]}")
+            print(f"Ultimo host: {hosts[-1]}")
+        else:
+            print("No hay hosts utilizables en esta red.")
+        pause()
