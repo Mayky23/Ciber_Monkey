@@ -41,7 +41,7 @@ def print_ascii_art() -> None:
     print(
         FRAME_COLOR
         + Style.BRIGHT
-        + "  [ BY: Mayky]"
+        + "  [By: Mayky]"
         + Style.RESET_ALL
         + Fore.WHITE
         + f"  Sistema: {platform.system()} {platform.release()}"

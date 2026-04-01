@@ -1,38 +1,155 @@
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 
-Write-Host "[*] Creando entorno virtual..." -ForegroundColor Cyan
-py -3 -m venv .venv
+$Status = [System.Collections.Generic.List[string]]::new()
+$GoBin = Join-Path $HOME "go\bin"
 
-Write-Host "[*] Activando entorno e instalando dependencias..." -ForegroundColor Cyan
-& ".\.venv\Scripts\python.exe" -m pip install --upgrade pip setuptools wheel
-& ".\.venv\Scripts\python.exe" -m pip install -r requirements.txt
+function Add-Status {
+    param([string]$Message)
+    $Status.Add($Message) | Out-Null
+}
+
+function Say {
+    param([string]$Message)
+    Write-Host $Message -ForegroundColor Cyan
+}
+
+function Warn {
+    param([string]$Message)
+    Write-Host $Message -ForegroundColor Yellow
+}
+
+function Ensure-UserPath {
+    param([string]$PathToAdd)
+    $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+    if (-not $userPath) {
+        [Environment]::SetEnvironmentVariable("Path", $PathToAdd, "User")
+        return
+    }
+    $parts = $userPath -split ';'
+    if ($parts -notcontains $PathToAdd) {
+        [Environment]::SetEnvironmentVariable("Path", ($userPath.TrimEnd(';') + ';' + $PathToAdd), "User")
+    }
+}
+
+function Ensure-PythonLauncher {
+    if (Get-Command py -ErrorAction SilentlyContinue) {
+        return "py"
+    }
+    if (Get-Command python -ErrorAction SilentlyContinue) {
+        return "python"
+    }
+    if (Get-Command winget -ErrorAction SilentlyContinue) {
+        Say "[*] Instalando Python..."
+        winget install --id Python.Python.3.12 --accept-package-agreements --accept-source-agreements --silent | Out-Null
+        if (Get-Command py -ErrorAction SilentlyContinue) {
+            return "py"
+        }
+        if (Get-Command python -ErrorAction SilentlyContinue) {
+            return "python"
+        }
+    }
+    throw "No se encontro Python en el sistema."
+}
+
+function Ensure-Go {
+    if (Get-Command go -ErrorAction SilentlyContinue) {
+        return
+    }
+    if (Get-Command winget -ErrorAction SilentlyContinue) {
+        Say "[*] Instalando Go..."
+        winget install --id GoLang.Go --accept-package-agreements --accept-source-agreements --silent | Out-Null
+    } elseif (Get-Command choco -ErrorAction SilentlyContinue) {
+        Say "[*] Instalando Go..."
+        choco install golang -y | Out-Null
+    } else {
+        throw "No se pudo instalar Go automaticamente."
+    }
+    if (-not (Get-Command go -ErrorAction SilentlyContinue)) {
+        throw "Go no esta disponible tras la instalacion."
+    }
+}
+
+function Install-GoTool {
+    param(
+        [string]$Label,
+        [string]$Binary,
+        [string]$Module
+    )
+
+    if (Get-Command $Binary -ErrorAction SilentlyContinue) {
+        Add-Status("${Label}: OK")
+        return
+    }
+
+    Ensure-Go
+    & go install $Module | Out-Null
+    Ensure-UserPath $GoBin
+    $env:Path += ";$GoBin"
+
+    if (Get-Command $Binary -ErrorAction SilentlyContinue) {
+        Add-Status("${Label}: OK")
+    } else {
+        Add-Status("${Label}: instalado, abre una nueva terminal para usarlo")
+    }
+}
+
+Say "[*] Preparando Ciber Monkey..."
+$PythonLauncher = Ensure-PythonLauncher
+
+Say "[*] Creando entorno virtual..."
+if ($PythonLauncher -eq "py") {
+    & py -3 -m venv .venv
+} else {
+    & python -m venv .venv
+}
+
+$VenvPython = ".\.venv\Scripts\python.exe"
+Say "[*] Instalando dependencias Python..."
+& $VenvPython -m pip install --upgrade pip setuptools wheel | Out-Null
+& $VenvPython -m pip install -r requirements.txt | Out-Null
+& $VenvPython -m pip install sqlmap | Out-Null
+Add-Status("Python deps: OK")
+Add-Status("sqlmap: OK (venv)")
 
 if (-not (Get-Command nmap -ErrorAction SilentlyContinue)) {
-    Write-Host "[!] Nmap no esta en PATH. Algunas funciones de escaneo avanzado no estaran disponibles hasta instalarlo." -ForegroundColor Yellow
+    if (Get-Command winget -ErrorAction SilentlyContinue) {
+        Say "[*] Instalando Nmap..."
+        winget install --id Insecure.Nmap --accept-package-agreements --accept-source-agreements --silent | Out-Null
+    } elseif (Get-Command choco -ErrorAction SilentlyContinue) {
+        Say "[*] Instalando Nmap..."
+        choco install nmap -y | Out-Null
+    }
 }
 
-if (-not (Get-Command sqlmap -ErrorAction SilentlyContinue)) {
-    Write-Host "[!] sqlmap no esta en PATH. La opcion de revision SQLi no estara disponible hasta instalarlo." -ForegroundColor Yellow
+if (Get-Command nmap -ErrorAction SilentlyContinue) {
+    Add-Status("nmap: OK")
+} else {
+    Add-Status("nmap: pendiente")
 }
 
-if (
-    -not (Get-Command amass -ErrorAction SilentlyContinue) -and
-    -not (Get-Command subfinder -ErrorAction SilentlyContinue) -and
-    -not (Get-Command assetfinder -ErrorAction SilentlyContinue)
-) {
-    Write-Host "[!] No hay herramientas de subdominios en PATH. Instala amass, subfinder o assetfinder si quieres esa opcion." -ForegroundColor Yellow
+if (Get-Command amass -ErrorAction SilentlyContinue) {
+    Add-Status("amass: OK")
+} else {
+    Add-Status("amass: pendiente")
 }
 
-if (
-    -not (Get-Command gobuster -ErrorAction SilentlyContinue) -and
-    -not (Get-Command ffuf -ErrorAction SilentlyContinue)
-) {
-    Write-Host "[!] No hay herramientas de directorios web en PATH. Instala gobuster o ffuf si quieres esa opcion." -ForegroundColor Yellow
+try {
+    Install-GoTool -Label "subfinder" -Binary "subfinder" -Module "github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest"
+    Install-GoTool -Label "gobuster" -Binary "gobuster" -Module "github.com/OJ/gobuster/v3@latest"
+    Install-GoTool -Label "ffuf" -Binary "ffuf" -Module "github.com/ffuf/ffuf/v2@latest"
+    Install-GoTool -Label "assetfinder" -Binary "assetfinder" -Module "github.com/tomnomnom/assetfinder@latest"
+}
+catch {
+    Warn "[!] Algunas herramientas Go no pudieron instalarse automaticamente: $($_.Exception.Message)"
 }
 
 Write-Host ""
-Write-Host "[+] Instalacion terminada." -ForegroundColor Green
+Write-Host "[+] Instalacion completada." -ForegroundColor Green
+Write-Host "[+] Resumen:" -ForegroundColor Green
+foreach ($line in $Status) {
+    Write-Host "    - $line"
+}
 Write-Host "[+] Para ejecutar:" -ForegroundColor Green
 Write-Host "    .\.venv\Scripts\Activate.ps1"
 Write-Host "    python CiberMonkey.py"
