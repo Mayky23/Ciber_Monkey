@@ -71,7 +71,7 @@ def print_menu(options: Iterable[MenuOption]) -> None:
 
 def get_menu_options() -> list[MenuOption]:
     return [
-        MenuOption(1, "DB Audit", run_audit_db_menu),
+        MenuOption(1, "DB Audit", lazy_action("Python.Auditar_BD", "main")),
         MenuOption(2, "Calc CIDR", lazy_action("Python.Cal_CIDR", "calculate_cidr")),
         MenuOption(3, "Data Gen", lazy_action("Python.Data_generator", "data_generator_main")),
         MenuOption(4, "DDoS", lazy_action("Python.DDos_atack", "ddos_attack_main")),
@@ -83,92 +83,6 @@ def get_menu_options() -> list[MenuOption]:
         MenuOption(10, "Sub Finder", lazy_action("Python.Subdomain_Enum", "subdomain_enum_main")),
         MenuOption(11, "Wifi Scanner", lazy_action("Python.Wifi_Scanner", "wifi_scanner_main")),
     ]
-
-
-def run_audit_db_menu() -> None:
-    module = importlib.import_module("Python.Auditar_BD")
-    if hasattr(module, "banner"):
-        module.banner()
-    print(Fore.CYAN + "Auditoria guiada de MySQL / MariaDB\n")
-
-    host = input("Host [127.0.0.1]: ").strip() or "127.0.0.1"
-    if host.lower() == "n":
-        return
-
-    port_raw = input("Puerto [3306]: ").strip() or "3306"
-    user = input("Usuario: ").strip()
-    if user.lower() == "n":
-        return
-    password = input("Password: ").strip()
-    schema = input("Base de datos / schema: ").strip()
-    if not user or not schema:
-        pause(Fore.BLACK + Back.RED + "Usuario y schema son obligatorios." + Style.RESET_ALL)
-        return
-
-    try:
-        port = int(port_raw)
-    except ValueError:
-        pause(Fore.BLACK + Back.RED + "Puerto no valido." + Style.RESET_ALL)
-        return
-
-    ssl_answer = input("Usar SSL/TLS? (s/n) [n]: ").strip().lower() or "n"
-    use_ssl = ssl_answer == "s"
-    pattern = input("Patron opcional para buscar (Enter para omitir): ").strip() or None
-
-    try:
-        with module.connect(host, user, password, port, schema, use_ssl) as conn:
-            grants = module.check_user_permissions(conn)
-            cfg = module.analyze_security_configurations(conn)
-            suspects = module.detect_plaintext_password_columns(conn, schema)
-
-            print(Fore.GREEN + "\nConexion correcta.\n")
-
-            print(Fore.CYAN + "[Permisos]")
-            if grants:
-                for grant in grants[:5]:
-                    print(f"- {grant}")
-                if len(grants) > 5:
-                    print(f"- ... y {len(grants) - 5} mas")
-            else:
-                print("- No se pudieron leer grants")
-
-            print(Fore.CYAN + "\n[Configuracion]")
-            print(f"- Version: {cfg.get('version', 'N/A')}")
-            print(f"- Modo SQL: {cfg.get('global_sql_mode', 'N/A')}")
-            print(f"- local_infile: {cfg.get('global_local_infile', 'N/A')}")
-            print(f"- secure_transport: {cfg.get('require_secure_transport', 'N/A')}")
-
-            print(Fore.CYAN + "\n[Columnas sensibles]")
-            if suspects:
-                for table, column, data_type in suspects[:10]:
-                    print(f"- {table}.{column} ({data_type})")
-                if len(suspects) > 10:
-                    print(f"- ... y {len(suspects) - 10} mas")
-            else:
-                print("- No se detectaron columnas sospechosas por nombre")
-
-            if pattern:
-                findings = module.find_sensitive_data(
-                    conn,
-                    schema=schema,
-                    pattern=pattern,
-                    max_rows_per_column=3,
-                    count_only=True,
-                )
-                print(Fore.CYAN + f"\n[Busqueda: {pattern}]")
-                if findings:
-                    for finding in findings[:10]:
-                        print(f"- {finding.table}.{finding.column}: {finding.count} coincidencias")
-                    if len(findings) > 10:
-                        print(f"- ... y {len(findings) - 10} mas")
-                else:
-                    print("- Sin coincidencias")
-
-    except Exception as exc:
-        pause(Fore.BLACK + Back.RED + f"Auditoria fallida: {exc}" + Style.RESET_ALL)
-        return
-
-    pause()
 
 
 def import_available(module_name: str) -> bool:
