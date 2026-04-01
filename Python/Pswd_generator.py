@@ -33,7 +33,7 @@ def generar_contrasena(longitud, opciones):
 def password_generator_main():
     while True:
         banner()
-        answer = input("Generar una contrasena? (s/n): ").strip().lower()
+        answer = input("Generar una contraseña? (s/n): ").strip().lower()
         if answer == "n":
             return
         if answer != "s":
@@ -59,7 +59,7 @@ def password_generator_main():
             pause(Fore.BLACK + Back.RED + str(exc) + Style.RESET_ALL)
             continue
 
-        print(Fore.LIGHTYELLOW_EX + "\nContrasena generada:")
+        print(Fore.LIGHTYELLOW_EX + "\nContraseña generada:")
         print(Style.RESET_ALL + password)
         pause()
 

@@ -19,14 +19,20 @@ def banner():
     draw_banner("", COMMON_ASCII, "Wrapper guiado para sqlmap", BANNER_COLOR)
 
 
-def build_sqlmap_command(target_url: str, output_dir: str, level: str, risk: str, extra_args: str) -> list[str]:
+def build_sqlmap_command(
+    target_url: str,
+    output_dir: str,
+    level: str,
+    risk: str,
+    extra_args: str,
+    use_forms: bool,
+) -> list[str]:
     command = [
         "sqlmap",
         "-u",
         target_url,
         "--batch",
         "--random-agent",
-        "--forms",
         "--level",
         level,
         "--risk",
@@ -34,6 +40,8 @@ def build_sqlmap_command(target_url: str, output_dir: str, level: str, risk: str
         "--output-dir",
         output_dir,
     ]
+    if use_forms:
+        command.append("--forms")
     if extra_args.strip():
         command.extend(extra_args.split())
     return command
@@ -52,6 +60,18 @@ def sql_injection_main():
             pause()
             return
 
+        print("1. URL con parametro GET")
+        print("2. Formulario web")
+        print("\nEjemplos del lab:")
+        print("- GET:  http://IP_DEL_HOST:8081/api/products?id=1")
+        print("- FORM: http://IP_DEL_HOST:8081/site/index.html  (o la URL del frontend con formulario)")
+        mode = input("\nModo [1/2] ('n' para volver): ").strip().lower()
+        if mode == "n":
+            return
+        if mode not in {"1", "2"}:
+            pause(Fore.RED + "Modo no valido. Pulsa Enter...")
+            continue
+
         target_url = input("URL objetivo ('n' para volver): ").strip()
         if target_url.lower() == "n":
             return
@@ -66,7 +86,8 @@ def sql_injection_main():
             "Argumentos extra opcionales (ej: --cookie=PHPSESSID=... --dbs), vacio si no hace falta: "
         )
 
-        command = build_sqlmap_command(target_url, output_dir, level, risk, extra_args)
+        use_forms = mode == "2"
+        command = build_sqlmap_command(target_url, output_dir, level, risk, extra_args, use_forms)
         print_info("\nComando a ejecutar:")
         print(" ".join(command))
         confirm = input("\nEjecutar sqlmap? (s/n): ").strip().lower()
